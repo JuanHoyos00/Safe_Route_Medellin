@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medellín Ruteo Seguro: A* vs Greedy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; }
+    </style>
+</head>
+<body class="relative font-sans antialiased bg-gray-900 text-gray-100">
+
+    <div id="map" class="z-0"></div>
+
+    <div class="absolute top-4 left-4 z-10 w-96 bg-gray-900/90 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-gray-700/50 flex flex-col gap-4">
+        <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">Medellín Seguro</h1>
+            <p class="text-xs text-gray-400">Selecciona origen y destino haciendo clic en el mapa</p>
+        </div>
+
+        <hr class="border-gray-700">
+
+        <div class="text-sm flex flex-col gap-1 bg-gray-800/50 p-3 rounded-lg border border-gray-700/30">
+            <div>📍 <span class="font-semibold text-cyan-400">Origen:</span> <span id="lbl-origen" class="text-xs text-gray-300">No seleccionado</span></div>
+            <div>🏁 <span class="font-semibold text-emerald-400">Destino:</span> <span id="lbl-destino" class="text-xs text-gray-300">No seleccionado</span></div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="flex justify-between text-sm">
+                <span class="text-cyan-400 font-medium">Distancia (α): <span id="val-alpha">0.5</span></span>
+                <span class="text-red-400 font-medium">Seguridad (β): <span id="val-beta">0.5</span></span>
+            </div>
+            <input type="range" id="slider-alpha" min="0" max="1" step="0.1" value="0.5"
+                   class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+        </div>
+
+        <button id="btn-calcular" disabled
+                class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-emerald-500 disabled:from-gray-700 disabled:to-gray-700 hover:from-cyan-600 hover:to-emerald-600 text-white font-bold rounded-xl shadow-lg transition duration-200 cursor-pointer disabled:cursor-not-allowed">
+            Calcular y Comparar Vías
+        </button>
+
+        <div id="panel-metricas" class="hidden flex flex-col gap-3 bg-gray-800/80 p-4 rounded-xl border border-gray-700">
+            <h2 class="text-sm font-bold tracking-wider text-gray-400 uppercase">Resultados del Test</h2>
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="border-r border-gray-700/50 pr-2">
+                    <div class="text-cyan-400 font-bold text-sm">🔵 A* Seguro</div>
+                    <div class="text-xs text-gray-400 mt-1">Nodos Exp: <span id="m-astar-nodos" class="text-white font-mono font-bold">0</span></div>
+                    <div class="text-xs text-gray-400">Costo: <span id="m-astar-costo" class="text-white font-mono font-bold">0</span></div>
+                </div>
+                <div class="pl-2">
+                    <div class="text-purple-400 font-bold text-sm">🟣 Greedy Local</div>
+                    <div class="text-xs text-gray-400 mt-1">Nodos Exp: <span id="m-greedy-nodos" class="text-white font-mono font-bold">0</span></div>
+                    <div class="text-xs text-gray-400">Costo: <span id="m-greedy-costo" class="text-white font-mono font-bold">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar el mapa interactivo centrado en Medellín
+        const map = L.map('map', { zoomControl: false }).setView([6.2442, -75.5643], 13);
+
+        // Carga de mapa base oscuro (CartoDB DarkMatter) para resaltar las rutas neón
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        let origenCoords = null;
+        let destinoCoords = null;
+        let marcadorOrigen = null;
+        let marcadorDestino = null;
+
+        // Listas de control de capas para poder limpiarlas en cada simulación
+        let capasExploracion = [];
+        let lineaAStar = null;
+        let lineaGreedy = null;
+
+        const sliderAlpha = document.getElementById('slider-alpha');
+        const lblAlpha = document.getElementById('val-alpha');
+        const lblBeta = document.getElementById('val-beta');
+
+        // Escucha del slider para asegurar que alpha + beta siempre sumen 1.0
+        sliderAlpha.addEventListener('input', (e) => {
+            let alpha = parseFloat(e.target.value);
+            let beta = (1.0 - alpha).toFixed(1);
+            lblAlpha.innerText = alpha;
+            lblBeta.innerText = beta;
+        });
+
+        // Capturador de clics geográficos en la malla vial
+        map.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+
+            if (!origenCoords) {
+                origenCoords = [lat, lng];
+                marcadorOrigen = L.marker(origenCoords).addTo(map).bindPopup("Origen").openPopup();
+                document.getElementById('lbl-origen').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            } else if (!destinoCoords) {
+                destinoCoords = [lat, lng];
+                marcadorDestino = L.marker(destinoCoords).addTo(map).bindPopup("Destino").openPopup();
+                document.getElementById('lbl-destino').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                document.getElementById('btn-calcular').disabled = false;
+            } else {
+                // Resetear interfaz si se hace un tercer clic consecutivamente
+                limpiarMapa();
+                origenCoords = [lat, lng];
+                destinoCoords = null;
+                marcadorOrigen = L.marker(origenCoords).addTo(map).bindPopup("Origen").openPopup();
+                document.getElementById('lbl-origen').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                document.getElementById('lbl-destino').innerText = "No seleccionado";
+                document.getElementById('btn-calcular').disabled = true;
+                document.getElementById('panel-metricas').classList.add('hidden');
+            }
+        });
+
+        function limpiarMapa() {
+            if (marcadorOrigen) map.removeLayer(marcadorOrigen);
+            if (marcadorDestino) map.removeLayer(marcadorDestino);
+            if (lineaAStar) map.removeLayer(lineaAStar);
+            if (lineaGreedy) map.removeLayer(lineaGreedy);
+            capasExploracion.forEach(capa => map.removeLayer(capa));
+            capasExploracion = [];
+        }
+
+        // FUNCIÓN DE ANIMACIÓN: Renderiza el historial y luego la ruta óptima
+        function animarAlgoritmo(historial, rutaFinal, colorHistorial, colorRuta, retrasoMs) {
+            let i = 0;
+
+            // Paso 1: Animación de la "mancha de aceite" (Nodos explorados por el while)
+            let intervaloHistorial = setInterval(() => {
+                if (i < historial.length) {
+                    // Dibujamos un pequeño círculo translúcido por cada nodo procesado
+                    let circulo = L.circleMarker(historial[i], {
+                        radius: 3,
+                        color: colorHistorial,
+                        fillColor: colorHistorial,
+                        fillOpacity: 0.4,
+                        opacity: 0.6
+                    }).addTo(map);
+                    capasExploracion.push(circulo);
+                    i++;
+                } else {
+                    clearInterval(intervaloHistorial);
+
+                    // Paso 2: Cuando termina de explorar, dibuja la ruta definitiva en neón brillante
+                    if (rutaFinal) {
+                        let j = 0;
+                        let polyline = L.polyline([], { color: colorRuta, weight: 5, opacity: 0.9, smoothFactor: 1 }).addTo(map);
+
+                        // Guardamos la referencia correcta para poder borrarla después
+                        if (colorRuta === '#06b6d4') lineaAStar = polyline;
+                        else lineaGreedy = polyline;
+
+                        let intervaloRuta = setInterval(() => {
+                            if (j < rutaFinal.length) {
+                                polyline.addLatLng(rutaFinal[j]);
+                                j++;
+                            } else {
+                                clearInterval(intervaloRuta);
+                            }
+                        }, 30);
+                    }
+                }
+            }, retrasoMs);
+        }
+
+        // Llamada asíncrona a la API de FastAPI
+        document.getElementById('btn-calcular').addEventListener('click', async () => {
+            // Limpiar líneas y círculos de simulaciones previas antes de pintar
+            if (lineaAStar) map.removeLayer(lineaAStar);
+            if (lineaGreedy) map.removeLayer(lineaGreedy);
+            capasExploracion.forEach(layer => map.removeLayer(layer));
+            capasExploracion = [];
+
+            const alpha = lblAlpha.innerText;
+            const beta = lblBeta.innerText;
+
+            const url = `/api/calcular-ruta?orig_lat=${origenCoords[0]}&orig_lon=${origenCoords[1]}&dest_lat=${destinoCoords[0]}&dest_lon=${destinoCoords[1]}&alpha=${alpha}&beta=${beta}`;
+
+            try {
+                const respuesta = await fetch(url);
+                const datos = await respuesta.json();
+
+                document.getElementById('panel-metricas').classList.remove('hidden');
+
+                // 1. Procesamiento y animación de A* (Historial Gris Azulado -> Línea Cian)
+                if (datos.a_star.ruta) {
+                    document.getElementById('m-astar-nodos').innerText = datos.a_star.explorados;
+                    document.getElementById('m-astar-costo').innerText = datos.a_star.costo.toFixed(4);
+                    animarAlgoritmo(datos.a_star.historial, datos.a_star.ruta, '#475569', '#06b6d4', 15);
+                } else {
+                    document.getElementById('m-astar-costo').innerText = "❌ No path";
+                }
+
+                // 2. Procesamiento y animación de Greedy (Historial Fucsia Suave -> Línea Morada)
+                if (datos.greedy.ruta) {
+                    document.getElementById('m-greedy-nodos').innerText = datos.greedy.explorados;
+                    document.getElementById('m-greedy-costo').innerText = datos.greedy.costo.toFixed(4);
+                    animarAlgoritmo(datos.greedy.historial, datos.greedy.ruta, '#d946ef', '#a855f7', 25);
+                } else {
+                    document.getElementById('m-greedy-nodos').innerText = "Atrapado";
+                    document.getElementById('m-greedy-costo').innerText = "❌ Falló";
+                    // Aun si falla, animamos los nodos donde intentó buscar antes de bloquearse
+                    animarAlgoritmo(datos.greedy.historial, null, '#d946ef', '#a855f7', 25);
+                }
+
+            } catch (error) {
+                alert("Error de comunicación con el servidor de ruteo.");
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
