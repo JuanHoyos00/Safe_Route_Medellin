@@ -46,19 +46,16 @@ async def calcular_ruta(orig_lat: float, orig_lon: float, dest_lat: float, dest_
     fmt_hist_a_star = [[lat, lon] for lon, lat in hist_a_star] if hist_a_star else []
     fmt_hist_greedy = [[lat, lon] for lon, lat in hist_greedy] if hist_greedy else []
 
-    costo_a_star_json = datos.a_star.costo if costo_a_star != float('inf') else None
-    costo_greedy_json = datos.greedy.costo if costo_greedy != float('inf') else None
-
     return JSONResponse({
         "a_star": {
             "ruta": fmt_a_star,
-            "costo": costo_a_star_json,  # <-- Ya no enviará 'inf' si falla
+            "costo": costo_a_star,
             "explorados": nodos_a_star,
             "historial": fmt_hist_a_star
         },
         "greedy": {
             "ruta": fmt_greedy,
-            "costo": costo_greedy_json,  # <-- Ya no enviará 'inf' si falla
+            "costo": costo_greedy,
             "explorados": len(ruta_greedy) if ruta_greedy else 0,
             "historial": fmt_hist_greedy
         }
