@@ -1,0 +1,307 @@
+﻿id,nombre,tipo,telefono,website,ciudad,latitud,longitud
+relation/5499088,IPS Universitaria - Clínica León XIII,clinica,(+574) 444 95 70,https://www.ipsuniversitaria.com.co/es/,,6.2666391,-75.5642517
+relation/6401602,,hospital,,,,6.3306803,-75.5577305
+way/32774024,Pabellón de Salud Mental,hospital,,,,6.2622682,-75.564473
+way/32774053,Policlínica,clinica,,,,6.263886,-75.5655879
+way/48616108,Centro de Salud La Loma,hospital,,,,6.2719055,-75.6310701
+way/52514672,Hospital Zamora,hospital,,,,6.3094961,-75.5518507
+way/67919138,CAI periferico La Loma,policia,,,,6.2622848,-75.6255723
+way/89578676,Unidad Hospitalaria San Javier,hospital,,,,6.2542939,-75.620306
+way/109200128,Clínica Victoriana,hospital,,,,6.2559798,-75.5634311
+way/113053216,Centro de salud florencia,hospital,,,,6.3083655,-75.569631
+way/120374270,Unidad Hospitalaria de Buenos Aires,hospital,,,Comuna 9 - Buenos Aires,6.2417488,-75.5537389
+way/122726424,Hospital Concejo de Medellín,hospital,+57 4 2637000 - 2635424,,,6.2683059,-75.5583297
+way/123621236,Comando de Policia San Cristobal,policia,,,,6.2773667,-75.6361442
+way/123992407,Clínica El Sagrado Corazón,hospital,,,Comuna 9 - Buenos Aires,6.2427225,-75.5572768
+way/134646950,Hospital Venancio Díaz Díaz,hospital,,http://www.esevenanciodiaz-sabaneta-antioquia.gov.co/,Sabaneta,6.147996,-75.6218066
+way/151876095,CAI San Michel,policia,,,,6.2538765,-75.6218407
+way/151943833,Centro de Salud Villa Laura,hospital,,,,6.2460175,-75.6197524
+way/160069295,Laboratorio de Policía Científica y Criminalística,policia,,,,6.2701591,-75.5723316
+way/179221628,Hospital Pablo Tobón Uribe,hospital,,https://www.hptu.org.co/,Medellin,6.2773157,-75.5797119
+way/180633571,Bomberos Aeronauticos,bomberos,,,,6.2207423,-75.5890701
+way/220964665,Clínica de Oftalmología Sandiego,clinica,,,Medellín,6.2289005,-75.5692414
+way/236153791,Clínica del Prado - Sede Ciudad del Río,hospital,,,,6.2224098,-75.5748752
+way/238527414,Cooperativa de Salud San Esteban,hospital,,,,6.278282,-75.6361414
+way/238806027,Unidad Hospitalaria San Cristóbal. Metrosalud.,hospital,,,,6.2788851,-75.635892
+way/238806028,Centro Médico Génesis. Dr. Mario León Uribe.,hospital,,,,6.2779046,-75.6354349
+way/271284725,Clínica Cardio Vid,hospital,,,,6.279388,-75.5846937
+way/271287360,Centro de Salud Civiton,clinica,,,,6.2851734,-75.5932213
+way/272060405,Fuerte Carabineros,policia,,,,6.2798618,-75.5093294
+way/273610634,Torre Médica Ciudad del Rio,clinica,+57 4 5897843,,,6.2232304,-75.574839
+way/274845654,Hospital Universitario Pontificia Bolivariana,hospital,,,,6.2769431,-75.5823273
+way/294740282,Clínica las Americas del Sur,hospital,,https://clinicalasamericas.lasamericas.com.co/Sedes/Sede-Sur,,6.1785787,-75.5834448
+way/300064788,Unidad Hospitalaria Doce de Octubre,hospital,+57 4 4782800,,,6.3023657,-75.578408
+way/304618526,Estación de Policía Belén,policia,,,,6.2216904,-75.5959994
+way/323902877,Clínica del Norte,clinica,,,,6.34292,-75.5459203
+way/336869330,CAI Periferico El Salado Parta Alta,policia,,,,6.2540828,-75.6296904
+way/339231702,Centro de Salud Santo Domingo Savio,clinica,,,Comuna 1 - Popular,6.2954895,-75.5433504
+way/343221170,Hospital Universitario San Vicente Paul,hospital,,,,6.2628386,-75.5652201
+way/344812014,Carisma Centro de Rehabilitación,hospital,,,Medellin,6.2423025,-75.6186297
+way/344821441,Base Militar,policia,,,,6.2476808,-75.6289098
+way/346618018,Centro De Salud Picacho,hospital,,,,6.2971042,-75.5830432
+way/346623968,Unidad Hospitalaria Doce De Octubre Luis Carlos Galán Sarmiento,hospital,,,,6.3082528,-75.5744993
+way/346625675,Estacion De Policia Barrio Santander,policia,,,,6.3098411,-75.574675
+way/346654414,Unidad Intermedia de Castilla,hospital,,,,6.2944983,-75.5688209
+way/346654417,Unidad Hospitalaria Castilla Jaime Tobón Arbeláez,hospital,,,,6.294202,-75.5688505
+way/355199716,Centro de Salud Santa Rosa de Lima,hospital,,,,6.2628455,-75.6042611
+way/378810156,Inspección de Policia San Joaquin,policia,,,,6.2448448,-75.5871805
+way/379904739,Bomberos Estación Santa Lucia / Floresta,bomberos,,,,6.2573224,-75.6102657
+way/381199986,CAI / Santa Lucía,policia,,,,6.2594735,-75.6043097
+way/394273951,Bomberos San Antonio de Prado,bomberos,,,,6.1837317,-75.641347
+way/395866344,Bomberos Guayabal,bomberos,,,,6.2151163,-75.5869384
+way/402783967,Centro de Salud La Maruchenga,clinica,,,,6.31243,-75.5728204
+way/407180366,Dinámica IPS,clinica,,,,6.2332848,-75.6047745
+way/419343048,CAI Pedregal,policia,,,,6.2993867,-75.5725794
+way/422657182,Guardia Civil,policia,,,,38.9619182,-5.9600278
+way/428521518,Cai de Paris,policia,,,,6.3114236,-75.579577
+way/434580936,Fundación Medico Preventiva,clinica,,,Medellin,6.2532509,-75.5740963
+way/434580992,,clinica,,,,6.2533453,-75.5742451
+way/435205181,Clínica El Rosario,hospital,+57 4 326 91 00,https://www.clinicaelrosario.com/,Medellín,6.1938575,-75.5575023
+way/437293525,Comando de Policia Antioquia,policia,,,,6.2468268,-75.5657697
+way/437428683,Hospital del Ejercito Nacional Cuarta Brigada,hospital,,,,6.2630107,-75.5930623
+way/441038589,CAI Doce de Octubre,policia,,,,6.3031727,-75.5788668
+way/441058793,Estación de Bomberos Doce de Octubre,bomberos,,,,6.3034137,-75.5775711
+way/441058794,Estación de Bomberos Doce de Octubre,bomberos,,,,6.3034433,-75.5775928
+way/441794789,Centro de Salud de Robledo,hospital,,,,6.2759926,-75.5881332
+way/443499833,Hospital Rosalpi,hospital,,,,6.3390106,-75.5638132
+way/447851667,Hospital La María,hospital,,,,6.2864391,-75.5744341
+way/453806993,Centro Clinico Hospitalario SALUTEM,clinica,,,Medellín,6.2404441,-75.591606
+way/504572150,Intermedia de Santa Cruz,hospital,,,,6.2934873,-75.5603249
+way/533036871,Comfama de Aranjuez,hospital,,,Comuna 4 - Aranjuez,6.2832364,-75.5621753
+way/542648397,Clínica Diagnóstica Especializada Congregación Mariana,clinica,,,,6.2487699,-75.5606986
+way/542648400,Centro de Fracturas La Orienta,clinica,,,Medellín,6.2522961,-75.5625835
+way/543112930,Metrosalud La Cruz,hospital,,,Comuna 3 - Manrique,6.2699394,-75.5367617
+way/551686399,Centro de Salud San Camilo,hospital,,,,6.2887954,-75.5868812
+node/565665697,SOMA,hospital,+57 4 576 84 00,,,6.2488833,-75.5645579
+way/570311101,Santa Ana Hospital Infantil,hospital,,,,6.2152267,-75.5715127
+way/572096397,Clinica Sanitas,clinica,,,,6.1908488,-75.5777503
+way/573377183,Centro Logístico Humanitario Cruz Roja Colombiana,clinica,,,,6.2280515,-75.57704
+way/588401275,Salud SURA,hospital,,,,6.2287433,-75.574097
+way/588402164,Savia salud EPS,hospital,,,,6.2271867,-75.5744281
+way/620214382,Florida Nueva,clinica,,,Comuna 11 - Laureles-Estadio,6.2500281,-75.5913828
+way/621513752,Estación de Policía Castilla,policia,,,,6.3047643,-75.5623139
+node/622134890,Estación de Policia Bello,policia,+57 4 4831148,,,6.3355402,-75.5503328
+way/633552302,Centro de Salud del Limonar,clinica,,,,6.1781268,-75.6441089
+way/667599152,CAI Periférico Picacho,policia,,,Comuna 6 - Doce de Octubre,6.3065164,-75.5824467
+way/682788559,Urgencias Leon XIII,hospital,,,,6.2668359,-75.5654957
+way/689360795,EMMSA,hospital,,,,6.3390428,-75.5421563
+way/689583523,Marco Fidel Suarez,hospital,,,,6.3426489,-75.5480809
+way/784629859,Balance,clinica,,,,6.2116693,-75.5598575
+way/784631519,Clínica Bioforma,clinica,,https://www.bioforma.com.co/,,6.1824447,-75.5645504
+way/784638254,Centro medico Buenos Aires,hospital,,,,6.242017,-75.5556743
+way/784675127,Centro de Salud de Aranjuez,clinica,,,medellin,6.2850771,-75.5586784
+way/784675128,Inspeccion de policia de aranjuez,policia,,,,6.2832416,-75.5584833
+way/784971695,,clinica,,,Medellín,6.2247513,-75.5989123
+way/784976271,Metrosalud- Unidad Hospitalaria,hospital,,,,6.2291366,-75.5983056
+way/784976272,Metrosalud- Unidad Hospitalaria,hospital,,,Medellín,6.2293909,-75.5979057
+way/784981127,Coopsana IPS -Sede Estadio,clinica,,,,6.2584063,-75.5929938
+way/785092507,Centro Médico Narabema,clinica,,,Medellín,6.2530114,-75.5910744
+way/785092508,Visión Total,clinica,,,,6.2508197,-75.5911899
+way/785092509,Coosalud EPS,clinica,,,Comuna 11 - Laureles-Estadio,6.2506291,-75.5882102
+way/785092510,CafeSalud,clinica,,,Comuna 11 - Laureles-Estadio,6.25303,-75.5887611
+way/785117927,Sofina Clinic,clinica,,,Medellín,6.2108519,-75.5729561
+way/785117928,Edifico Medical,clinica,,,Medellín,6.2063577,-75.5701074
+way/785117929,INTERMEDICA Centro de Especialistas,clinica,,,Medellín,6.2061774,-75.5705212
+way/785117930,Consultorios Clínica Medellín Torre Fundadores,clinica,,,Medellín,6.2068064,-75.5710153
+way/785117932,Laboratorio Clínico Hematológico,clinica,,,Medellín,6.2063822,-75.573195
+way/785117933,Umma Especialistas,clinica,,,Medellín,6.2088259,-75.5748123
+way/785128778,Torre Médica Las Américas,clinica,,https://torremedica.lasamericas.com.co/,Medellín,6.2139529,-75.595759
+way/785147487,Instituto del Corazón,clinica,,,Medellín,6.2430592,-75.5942378
+way/785147488,Dentix,clinica,,,Medellín,6.244149,-75.5947379
+way/785147492,Clínica del Amor,clinica,,https://www.clinicadelamor.com,Medellín,6.2397694,-75.5953721
+way/785147493,Centro Médico Canes,clinica,,,,6.2394461,-75.5957334
+way/785147494,Omnisalud,clinica,,,Medellín,6.2392913,-75.5939302
+way/785147497,Central Medical Group S.A.S,clinica,,,Medellín,6.2393587,-75.5916424
+way/785147498,CliniQ Dermoestetica & Laser,clinica,,,Medellín,6.2405961,-75.592159
+way/785147500,IPS Confamilliar Laureles,clinica,,,Medellín,6.2436236,-75.593186
+way/785161711,Laboratorio Clinico Belen,hospital,,,,6.2322185,-75.5973221
+way/785173405,Los Alamos Clinica de Especialistas,clinica,,,,6.2385301,-75.5977664
+way/785173889,SALUD VITAL Y RIESGOS PROFESIONALES IPS SAS,clinica,,,,6.2378936,-75.5985088
+way/785424842,,policia,,,,6.2648721,-75.5741077
+way/785455194,Hogar de paso Dos. Centro de Rehabilitación para Jóvenes,clinica,,,,6.2781024,-75.5816581
+way/785478912,Coopsana Norte IPS,clinica,,,Medellín,6.2918447,-75.5697242
+way/786072858,Quirófanos y especialistas,clinica,,,,6.2433743,-75.5987381
+way/786247889,EPS Sura San Diego,clinica,,,Medellín,6.2301685,-75.5685214
+way/786386322,Oficina Programa Aph de Metrosalud,clinica,,,,6.2839656,-75.5765739
+way/786956653,,policia,,,,6.2772238,-75.546705
+way/786988413,,hospital,,,,6.3041258,-75.5528766
+way/787001074,Spazio,clinica,,,,6.239162,-75.5994075
+way/787001395,Clínica oftalmologica nueva vision,clinica,,,,6.239113,-75.5988046
+way/787667192,Inspección de Policia Robledo No. 7A,policia,,,,6.2754027,-75.5964202
+way/787961634,Adala,clinica,,,,6.2532464,-75.5922161
+way/787961635,Centro de salud más cerca,clinica,,,,6.2513625,-75.5963555
+way/787963496,Comisaría de Familia- Inspección de Policia urbana.,policia,,,,6.2508411,-75.5956425
+way/788068715,CAI Playon,policia,,,,6.3074395,-75.5554055
+way/788071556,Estímulos IPS,clinica,,,,6.2458002,-75.598068
+way/788073656,Hospital Universitario de San Vicente Fundación,hospital,,,,6.2792644,-75.6019926
+way/788073874,CAI Aures,policia,,,,6.2910855,-75.5925031
+way/788327227,IPS Integrados,clinica,,,,6.2803303,-75.5857385
+way/789749090,,hospital,,,,6.3041288,-75.5528743
+way/793361660,Comando Policia MEVAL,policia,,,Medellín,6.2512056,-75.5777605
+way/793361663,Estación de Bomberos Libertadores,bomberos,,,Medellín,6.2517525,-75.5775035
+way/793890500,inSer,clinica,,https://www.inser.com.co/en/,,6.2132157,-75.5671943
+way/796488900,Unidad Intermedia Santa Cruz,hospital,,,,6.2900806,-75.5616842
+way/801457122,Centro de Ortopedia y Traumatologia,clinica,,,,6.2587064,-75.5912915
+way/812501828,Clínica Las Américas Promotora,clinica,,lasamericas.com.co,Medellín,6.2140356,-75.5949308
+way/814491794,Clínica de Medellín - Sede Occidente,clinica,+57 4 4446152,https://www.clinicamedellin.com/sedes/,,6.2326354,-75.584429
+way/834197665,Clínica Medellín,hospital,,,,6.2513184,-75.563963
+way/854090374,Clínica Las Vegas,hospital,,,,6.2033285,-75.5764497
+way/859059771,Cruz Blanca EPS,clinica,,,,6.2471793,-75.602749
+way/947160026,Clínica Universitaria Bolivariana,clinica,,,,6.2768309,-75.5823405
+way/952511244,estacion de policia cabaña,policia,,,,6.3171908,-75.5635337
+node/956568204,,hospital,,,,6.294778,-75.5525882
+node/956568477,,policia,,,,6.2947367,-75.5526577
+way/957422254,Hospital General de Medellin,hospital,,,,6.2342892,-75.5726499
+way/961705629,,policia,,,,6.1698456,-75.5873555
+way/995060329,Escuela de Policía Carlos Holguín Mallarino,policia,,,,6.3059307,-75.5619993
+way/1005339157,Estación de Policía de Laureles,policia,,,,6.2480421,-75.5949964
+way/1024730145,Hospital Mental de Antioquia,hospital,,,,6.3250245,-75.5650501
+way/1060899840,Clínica Universitaria Bolivariana,clinica,,,,6.2769702,-75.5825056
+way/1090462518,Instituto Neurológico de Colombia,hospital,,https://institutoneurologico.org/,Medellín,6.2525186,-75.5634342
+way/1090889646,Metrosalud Guayaquil,hospital,,,,6.244711,-75.5698963
+way/1090891446,Salud Total,hospital,,,,6.251965,-75.5965748
+way/1094706074,Unidad Hospitalaria Manrique,hospital,+57 4 2115353,,,6.2618375,-75.5531984
+way/1094708709,Clínica Conquistadores,hospital,,,,6.2406541,-75.5828836
+way/1098678272,Centro de salud Llanaditas,clinica,,,,6.251842,-75.5438044
+way/1098681650,Metrosalud Nuevo Occidente,hospital,+57 604 425-9330,,Medellín,6.2808823,-75.6131082
+node/1190191270,Unidad Renal,hospital,,,,6.1948324,-75.5781105
+node/1193707988,Clínica de la Policía,hospital,,,,6.1620713,-75.5987776
+way/1210178066,CAI de Villatina,policia,,,,6.2374466,-75.541273
+way/1215450039,NOVA Cirugía Plástica,clinica,,https://novacirugiaplastica.com/,,6.1969495,-75.5788154
+way/1215450040,Torre Médica Salud Vegas,clinica,,,,6.2040502,-75.5766546
+way/1215450041,Clínica Aurora,clinica,,https://clinicaaurora.com.co/,,6.2093865,-75.575161
+way/1215450042,Clínica Aurora Sede 2,clinica,,https://clinicaaurora.com.co/,,6.2090817,-75.5750853
+way/1215450043,Clínica Orlant,clinica,,https://clinicaorlant.com/,,6.2403671,-75.5795074
+way/1215450044,Clínica Odontológica PROMTA,clinica,,https://promta.com.co/,,6.250777,-75.5594637
+node/1237519699,Hospital Manuel Uribe Angel,hospital,,,,6.1668147,-75.5800586
+way/1286669825,Estación de Policía de Sabaneta,policia,,,,6.1486113,-75.6249188
+way/1383093477,Clínica Vida -  Sede La 80,clinica,,,Medellín,6.2246781,-75.5989388
+node/1397149599,CAI El Playón,policia,,,,6.3074448,-75.5554069
+way/1417320520,,hospital,,,,6.2706633,-75.6290766
+way/1467099732,CAI Valadares,policia,,,,6.3430807,-75.5698494
+way/1468027991,Hospital Marco Fidel Suarez,hospital,,,,6.3306704,-75.5574023
+node/1469634100,Santa Elena,policia,,,,6.2112647,-75.49974
+way/1470366494,CAI Caribe,policia,,,,6.2781285,-75.5725001
+way/1470430584,Estación de Bomberos Norte,bomberos,,,,6.275185,-75.5712553
+way/1474847509,Comando de Policía de Antioquia,policia,,,,6.2712545,-75.5759221
+way/1475075299,Movilidad de Medellín,policia,,,,6.2649305,-75.5742296
+way/1475168879,CAI La Minorista,policia,,,,6.258262,-75.5720532
+way/1478609945,,hospital,,,,6.2434131,-75.540385
+way/1478718250,CAI La Macarena,policia,,,,6.2496977,-75.5811596
+way/1478733338,CAI Solla,policia,,,,6.3110237,-75.5585838
+way/1482626367,,policia,,,,6.3437023,-75.690653
+way/1487056408,,hospital,,,,6.2156325,-75.5756149
+node/1561077835,,hospital,,,,6.2615485,-75.5611069
+node/1655206964,CAI La Milagrosa,policia,,,,6.235412,-75.5555878
+node/1656578064,Estación de Policia,policia,,,,6.169708,-75.5874395
+node/1657069502,CAI Las Cometas,policia,,,,6.1699883,-75.577558
+node/1850606774,Bomberos,bomberos,,,,6.2684925,-75.5578498
+node/1895708067,Centro Médico Nueva Vida,hospital,,,,6.2840212,-75.5842167
+node/2154586208,Serad,clinica,,,Medellín,6.260079,-75.561627
+node/2351691552,,policia,,,,6.1549773,-75.5374884
+node/2378655330,Estación de Policía Buenos Aires,policia,,,,6.2313275,-75.5399226
+node/2379649633,Centro de Salud Loreto,clinica,,,,6.2331177,-75.5559039
+node/2807739300,Saludcoop Laureles,clinica,,,,6.2436264,-75.5929633
+node/2972395707,Centro de Salud - Pinares de Oriente,clinica,,,,6.2434231,-75.5404091
+node/3346687747,CAI Guayabal,policia,,,Medellín,6.2035477,-75.5873046
+node/3448766640,Clínica Santa Gertrudis,hospital,,,,6.1686318,-75.5818312
+node/3570781195,,policia,,,Comuna 8,6.2356684,-75.5253481
+node/3706360402,CAI,policia,,,,6.2838569,-75.5839059
+node/3799892357,CAI,policia,,,Comuna 1 - Popular,6.2951049,-75.5375803
+node/4081890013,Universidad Pascual Bravo,hospital,,,,6.2749027,-75.5875358
+node/4152321789,IPS Universitaria - Sede Prado,clinica,,,,6.2611556,-75.5653804
+node/4231972194,Centro de Salud El Salvador,clinica,,,,6.2379305,-75.5606633
+node/4315816192,hermanitas hospitalarias del sagrado corazón,clinica,,,,6.2594164,-75.5619578
+node/4325636732,Clínica de Antioquia,hospital,,,,6.3349603,-75.5573678
+node/4327588183,Fundación Hogar Claret,hospital,,,Comuna 8,6.2395446,-75.5274183
+node/4332335639,basurero,hospital,,,,6.2937784,-75.5396995
+node/4332349859,,hospital,,,,6.2933251,-75.5385274
+node/4538750489,Remy ips Medellín,clinica,,,,6.2577427,-75.5637284
+node/4588195492,Coomeva EPS,clinica,,,,6.2296276,-75.5913111
+node/4595518903,IPS Comfama SURA,hospital,,https://www.comfama.com/,,6.2456545,-75.5645554
+node/4602932697,,clinica,,,,6.2184873,-75.5763702
+node/4698260089,OFEX,clinica,,,,6.2381215,-75.6007042
+node/4698722891,Clínica Emmsa,clinica,,,,6.3389999,-75.542059
+node/4950119029,Clínica Laser De Piel,clinica,,,,6.2406067,-75.587777
+node/4956120322,San Esteban IPS,hospital,,,Medellín,6.2782437,-75.6361794
+node/4956131446,Centro de Medicina Familiar,hospital,,,Medellín,6.277878,-75.6358643
+node/4988253350,,policia,,,,6.1849322,-75.6559997
+node/5321092779,Bomberos Sabaneta,bomberos,,,,6.1559108,-75.6165329
+node/5322175049,Estacion Policia de Turismo,policia,,,,6.2451826,-75.5759366
+node/5426975195,Drogueria Dallas,hospital,,,Comuna 3 - Manrique,6.2668654,-75.5423047
+node/5481761419,Suxi Medical,clinica,,,,6.238882,-75.5937655
+node/5489903988,Lineas Hospitalarias,hospital,,,,6.2391753,-75.5862165
+node/5494779522,Incodol,clinica,,,,6.2391321,-75.5946754
+node/5494780321,,clinica,,,,6.2595678,-75.5991632
+node/5532355994,Clínica de Oncología Astorga,clinica,,,,6.2097609,-75.5731943
+node/5545722855,Centro de Salud Raizal,hospital,,,,6.2666715,-75.5447521
+node/5546798380,Consultorio Medico,clinica,,,,6.3087776,-75.5676609
+node/5548536632,Inspeccion de Policia 16a,policia,,,,6.232855,-75.5959597
+node/5548537522,Cai La Castellana,policia,,,,6.238198,-75.6083895
+node/5548721285,CAI,policia,,,,6.1771129,-75.5451596
+node/6634698409,Urgencias delNorte SAS,hospital,,,,6.3330822,-75.556573
+node/7034914924,Estación de Policia Candelaria,policia,,,,6.2500138,-75.5733727
+node/7195315958,Salud en casa EPS Sura,clinica,,,,6.2521768,-75.5982253
+node/7333313369,Centro medico a 67,clinica,,,,6.3073649,-75.5654367
+node/7337809235,SURA Comfama,clinica,,,,6.2641273,-75.5971144
+node/7337809244,CAI,policia,,,,6.2678833,-75.5916271
+node/7351140381,IPS Universitaria,clinica,,,,6.2682175,-75.5685643
+node/7351231363,Salud Visual San Diego,clinica,,,Medellín,6.2300922,-75.5684574
+node/7367759776,policia metropolitana - laureles,policia,,,,6.2562117,-75.5893606
+node/7412089897,Centro de salud Enciso,clinica,,,,6.2507081,-75.550144
+node/7417992988,,policia,,,,6.2102053,-75.5709737
+node/7808521292,Centro Médico San Camilo,clinica,+57 3018226,,Medellín,6.2651087,-75.5642409
+node/7808521294,IPS universitaria Leon XIII,clinica,,,,6.266554,-75.56391
+node/7852231937,POLICIA,policia,01 800 0910600,,,6.270152,-75.576859
+node/7855091947,Centro de Fracturas Cefra S.a.,hospital,+57 4 2665582,,,6.2102283,-75.5763173
+node/7855091948,Centro de Salud Carpinello,clinica,+57 4 5285559,,,6.286615,-75.541254
+node/7855091949,Metrosalud Enciso,clinica,+57 4 2842434,,,6.2505888,-75.550023
+node/7855091950,Centro de Salud Pablo Vi,clinica,+57 4 4611213;+57 4 4618918,,,6.3041919,-75.5528485
+node/7855091951,Centro de Salud Villa del Socorro,clinica,+57 4 2581568;+57 4 2362204,,,6.29575,-75.5546392
+node/7855091952,Centro de Salud San Blas,clinica,+57 4 2134274;+57 4 5713750,,,6.280886,-75.548404
+node/7855091954,Centro de Salud Villatina,clinica,+57 4 2691461;+57 4 2272674,,,6.2375294,-75.5413127
+node/7855091955,Torre Medica de Prado,clinica,+57 4 2118484,,,6.261618,-75.5616611
+node/7855091956,Fracturas y Rayos X de Antioquia,clinica,+57 4 2306844;+57 4 2304586;+57 4 8618232,,,6.2694623,-75.5588883
+node/7855091957,Hospital Infantil Clinica Noel,hospital,+57 4 2636046;+57 4 8636046,,,6.2609231,-75.5615089
+node/7855091959,Centro de Salud Popular 1,clinica,+57 4 2580024,,,6.2972595,-75.5490022
+node/7855091960,Centro de Salud Moravia,clinica,+57 4 2126612,,,6.2747449,-75.5662117
+node/7855091961,CENTRO POLICLÍNICO S.A.,hospital,+57 4 2515867;+57 4 2515861,,,6.2486808,-75.5652647
+node/7855091962,Centro Medico y Odont. Oralser,clinica,+57 4 2845138,,,6.257722,-75.564828
+node/7961015963,inspección sexta de policía,policia,,,,6.3154394,-75.5679591
+node/8599006342,UAB Villanueva,clinica,,,,6.2556262,-75.5642377
+node/8836120221,UAB Florida,clinica,,,,6.2705286,-75.5765702
+node/9104462621,,hospital,,,,6.2586175,-75.5859105
+node/9106677129,,clinica,,,,6.239751,-75.5799335
+node/9106677132,Salud Integral el Nogal,clinica,,,,6.2382898,-75.5968081
+node/9106677141,Grupo Coomeva,clinica,,,,6.2389021,-75.5931744
+node/9108805999,Coopsana Sura,clinica,,,,6.253506,-75.5836973
+node/9120288020,Metrosalud Estadio,hospital,,,,6.2559753,-75.589549
+node/9131147058,Savia Salud,hospital,,,,6.2509058,-75.6027051
+node/9146859976,IPS Prosalco San Juan,clinica,,,,6.2517335,-75.6066415
+node/9163802075,EPS Sura San Juan,clinica,,,,6.251376,-75.6066919
+node/9211386974,Punt Fin EPS Seguridad Industrial,hospital,,,,6.2634902,-75.5867116
+node/9225456014,Drogeria Santa  Gema,hospital,,,,6.238371,-75.606186
+node/9359329304,Centro Especializado Sabana,clinica,,,,6.1577475,-75.6145459
+node/9386600317,Policía del turismo,policia,,,,6.2433097,-75.5796084
+node/9583400017,Salud Total EPS,clinica,,,,6.2505903,-75.5991446
+node/9604441368,Metro Salud San Javier,hospital,,,,6.2543018,-75.6203308
+node/9752901442,Clínica El Rosario,hospital,,,,6.2556022,-75.5565512
+node/9904785317,Tranvia Plaza,clinica,,,,6.2449911,-75.5611568
+node/10813174680,Cai Kennedy,policia,,,,6.2909376,-75.5806608
+node/11261337154,Clínica Odontológica Oral Láser,clinica,,https://oralaser.com.co/,,6.2041283,-75.5769617
+node/11270285734,CediMed,clinica,,,,6.2068143,-75.570941
+node/11270285735,Clínica Clofán,clinica,,https://www.clofan.com/,,6.223327,-75.5749033
+node/11270285740,IQ InterQuirófanos,clinica,,,,6.2064259,-75.5701608
+node/11359311679,Cuerpo oficial de bomberos Medellín - Estación de bomberos Buenos Aires,bomberos,,,,6.2345812,-75.5481116
+node/11541758160,Drogueria Juan XXIII,hospital,,,Comuna 4 - Aranjuez,6.2821031,-75.5610656
+node/11848916447,Metrosalud picacho,clinica,,,,6.2978871,-75.5835605
+node/11848916451,,policia,,,,6.3045934,-75.5826538
+node/11848916455,Comisaria Dee Familia,policia,,,,6.3030245,-75.5772724
+node/12389361456,Dra Diamond - Medicina Estética y Tricologia,clinica,,https://www.instagram.com/dra_diamond,Envigado,6.1529237,-75.5377568
+node/12875618478,E.S.E Hospital La María,hospital,,,,6.2379517,-75.5714719
+node/13097392510,Clínica Oftalmológica de Medellín,clinica,,https://clinicaoftalmologicamedellin.com,Medellín,6.2060078,-75.5600676
+node/13112454895,Neurovida,clinica,,,,6.2448489,-75.5940696
+node/13116899630,Unidad de Policía Transporte Masivo Metro,policia,,,,6.2507612,-75.567799
+node/13118665151,Óptica Visión Integrados,clinica,,,,6.2390913,-75.5877455
+node/13596176953,Estación de Policia Palmitas,policia,,,,6.343685,-75.6906573
+node/13696194450,Biomedical Esthetic Center,clinica,,,Medellín,6.2034201,-75.5765133

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeRoute Mapa | Medellín</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/map_style.css">
+</head>
+<body>
+
+    <div id="mapa" style="width: 100vw; height: 100vh; position: absolute; top: 0; right: 0; z-index: 1;"></div>
+
+   <div class="control-panel" id="panel-lateral">
+        <button id="toggle-panel" class="toggle-btn" title="Ocultar/Mostrar Panel">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="panel-content">
+            <div class="panel-header">
+                <a href="index.html" class="btn-back" title="Volver al inicio"><i class="fa-solid fa-arrow-left"></i></a>
+                <h2>Navegación</h2>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fa-solid fa-microchip" style="color: #6b7280;"></i> Algoritmo a utilizar</label>
+                <select id="algo-select" class="custom-select">
+                    <option value="both">Ambos (Comparación Visual)</option>
+                    <option value="greedy">Greedy (Más rápido, menos óptimo)</option>
+                    <option value="astar">A* (Más lento, ruta óptima)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fa-solid fa-location-dot" style="color: #2563eb;"></i> Origen (Escribe, GPS o mapa)</label>
+                <div class="location-controls">
+                    <input type="text" id="origen-input" placeholder="Ej: 6.2442, -75.5812">
+                    <button id="btn-gps-origen" class="icon-btn gps-btn"><i class="fa-solid fa-crosshairs"></i></button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Destino (Escribe, GPS o mapa)</label>
+                <div class="location-controls">
+                    <input type="text" id="destino-input" placeholder="Ej: 6.2518, -75.5684">
+                    <button id="btn-gps-destino" class="icon-btn gps-btn"><i class="fa-solid fa-crosshairs"></i></button>
+                </div>
+            </div>
+
+            <button id="btn-limpiar" class="btn-secondary-small"><i class="fa-solid fa-trash-can"></i> Limpiar Mapa</button>
+
+            <hr>
+
+            <div class="sliders-container">
+                <div class="slider-group">
+                    <label>Preferencia de Ruta: <span id="pref-value">Balanceada</span></label>
+                    <input type="range" id="ruta-slider" min="0" max="1" step="0.1" value="0.5">
+                    <div class="slider-labels">
+                        <span><i class="fa-solid fa-bolt"></i> + Rápida</span>
+                        <span><i class="fa-solid fa-shield-halved"></i> + Segura</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-calcular" class="btn-main"><i class="fa-solid fa-route"></i> Calcular Ruta Segura</button>
+
+            <hr>
+
+            <div class="emergency-section">
+                <p class="emergency-title">Zona de Emergencia</p>
+                <div class="emergency-buttons">
+                    <button id="btn-cai" class="btn-emergency cai"><i class="fa-solid fa-shield-halved"></i> CAI</button>
+                    <button id="btn-hosp" class="btn-emergency hosp"><i class="fa-solid fa-truck-medical"></i> Hospital</button>
+                </div>
+            </div>
+
+            <div id="stats-panel" class="stats-panel hidden">
+                <h4><i class="fa-solid fa-chart-pie"></i> Rendimiento</h4>
+                <p id="wrap-astar"><strong>A*:</strong> <span id="stat-astar">0</span> ms | Nodos: <span id="nodes-astar">0</span></p>
+                <p id="wrap-greedy"><strong>Greedy:</strong> <span id="stat-greedy">0</span> ms | Nodos: <span id="nodes-greedy">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
