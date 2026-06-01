@@ -44,7 +44,15 @@ def algorithm_a_star(graph, origin, destination, alpha, beta):
                 current = previous_path[current]
             route.append(origin)
             route.reverse()
-            return route, total_cost, explored_nodes, history_visited
+            history_coords = []
+            for u, v in history_visited:
+                lat_u, lon_u = graph.nodes[u]['y'], graph.nodes[u]['x']
+                lat_v, lon_v = graph.nodes[v]['y'], graph.nodes[v]['x']
+
+                history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
+
+            return route, total_cost, explored_nodes, history_coords
+
 
         for neighbor in graph.neighbors(current_node):
             edge_data = graph.get_edge_data(current_node, neighbor)

@@ -29,7 +29,14 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
         history_visited.append((parent_node, current_node))
 
         if current_node == destination:
-            return current_route, current_cost, history_visited
+            history_coords = []
+            for u, v in history_visited:
+                lat_u, lon_u = graph.nodes[u]['y'], graph.nodes[u]['x']
+                lat_v, lon_v = graph.nodes[v]['y'], graph.nodes[v]['x']
+
+                history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
+
+            return current_route, current_cost, history_coords
 
         for neighbor in graph.neighbors(current_node):
             if neighbor not in closed_set:

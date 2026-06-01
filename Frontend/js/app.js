@@ -133,7 +133,7 @@ barrioDestinoSelect.addEventListener('change', (e) => {
         const partes = e.target.value.split(',');
         coordsDestino = [parseFloat(partes[0]), parseFloat(partes[1])];
         MapManager.setDestination(coordsDestino[0], coordsDestino[1]);
-        destinoInput.value = `${coordsDestino[0], coordsDestino[1]}`;
+        destinoInput.value = `${coordsDestino[0]}, ${coordsDestino[1]}`;
         mapaBloqueado = true;
         map.setView(coordsDestino, 15);
     }
@@ -247,22 +247,18 @@ function procesarRespuesta(data, modo, conAnimacion) {
 
     if (conAnimacion) {
         esAnimandoActualmente = true;
-        if (data.greedy) {
-            MapManager.animateExploration(data.greedy.history_visited, "#ef4444");
-            MapManager.drawRoute(data.greedy.route, "#ef4444", true);
-        }
-        if (data.a_star) {
-            MapManager.animateExploration(data.a_star.history_visited, "#2563eb");
-            MapManager.drawRoute(data.a_star.route, "#2563eb", true);
-        }
 
-        const maxNodos = Math.max(
-            data.greedy ? data.greedy.history_visited.length : 0,
-            data.a_star ? data.a_star.history_visited.length : 0
-        );
-        setTimeout(() => {
+        const histA = data.a_star ? data.a_star.history_visited : null;
+        const histG = data.greedy ? data.greedy.history_visited : null;
+
+        // Disparamos la carrera sincronizada
+        MapManager.animateRace(histA, histG, () => {
+            // Callback: Esto se ejecuta solo cuando la carrera termina
             esAnimandoActualmente = false;
-        }, (maxNodos * 10) + 500);
+            // Usamos colores de alto contraste: Fucsia para Greedy (dashed), Cian para A* (sólido)
+            if (data.greedy) MapManager.drawRoute(data.greedy.route, "#ff00aa", true);
+            if (data.a_star) MapManager.drawRoute(data.a_star.route, "#00e5ff", false);
+        });
 
     } else {
         pintarTodoInstantaneo(data);
@@ -277,10 +273,10 @@ function pintarTodoInstantaneo(data) {
     MapManager.clearRoutes();
 
     if (data.greedy && data.greedy.route) {
-        MapManager.drawRoute(data.greedy.route, "#ef4444", false);
+        MapManager.drawRoute(data.greedy.route, "#ff00aa", true);
     }
     if (data.a_star && data.a_star.route) {
-        MapManager.drawRoute(data.a_star.route, "#2563eb", false);
+        MapManager.drawRoute(data.a_star.route, "#00e5ff", false);
     }
 }
 
@@ -296,19 +292,15 @@ chkMapaCalor.addEventListener('change', async (e) => {
 
                 const puntosCSV = await response.json();
 
-                capaMapaCalor = L.heatLayer(puntosCSV, {
-                    radius: 25,
-                    blur: 15,
-                    maxZoom: 15,
-                    gradient: {0.2: 'blue', 0.4: 'lime', 0.7: 'orange', 1.0: 'red'}
-                });
+                // Usamos la configuración optimizada de MapManager
+                capaMapaCalor = MapManager.renderHeatmap(puntosCSV);
             } catch (err) {
                 console.error("Error cargando backend, ejecutando simulación segura:", err);
                 const puntosFallback = [
                     [6.2442, -75.5714, 0.9], [6.2460, -75.5670, 0.8],
                     [6.2625, -75.5510, 0.85], [6.2100, -75.5650, 0.2]
                 ];
-                capaMapaCalor = L.heatLayer(puntosFallback, { radius: 25, blur: 15 });
+                capaMapaCalor = MapManager.renderHeatmap(puntosFallback);
             }
         }
         capaMapaCalor.addTo(map);
