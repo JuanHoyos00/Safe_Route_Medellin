@@ -15,8 +15,27 @@ class EmergencyLocator:
 
     def _load_data(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        data_dir = os.path.join(base_dir, "..", "..", "Data")
 
+        # Escaneo robusto de carpetas para evitar fallos en la nube (Railway/Linux)
+        posibles_rutas = [
+            os.path.join(base_dir, "..", "..", "Data"),
+            os.path.join(base_dir, "..", "..", "data"),
+            os.path.join(base_dir, "..", "Data"),
+            "Data",
+            "data"
+        ]
+
+        data_dir = None
+        for ruta in posibles_rutas:
+            if os.path.exists(ruta):
+                data_dir = ruta
+                break
+
+        if not data_dir:
+            print("[ERROR CRÍTICO] No se encontró la carpeta de datos de emergencias.")
+            return
+
+        # 1. Cargar CAIs
         cai_path = os.path.join(data_dir, "cai_valle_aburra_con_coordenadas.csv")
         if os.path.exists(cai_path):
             df_cai = pd.read_csv(cai_path)
@@ -35,11 +54,17 @@ class EmergencyLocator:
             if cai_coords:
                 self.cai_tree = KDTree(cai_coords)
                 print(f"[EmergencyLocator] {len(cai_coords)} CAIs indexados.")
+        else:
+            print(f"[ERROR] Archivo de CAIs no encontrado en: {cai_path}")
 
+        # 2. Cargar Hospitales
         hosp_path = os.path.join(data_dir, "servicios_emergencia_valle_aburra.csv")
         if os.path.exists(hosp_path):
             df_hosp = pd.read_csv(hosp_path)
             df_hosp = df_hosp.dropna(subset=['latitud', 'longitud'])
+
+            # Limpiamos mayúsculas y espacios en la columna 'tipo'
+            df_hosp['tipo'] = df_hosp['tipo'].astype(str).str.strip().str.lower()
             df_hosp = df_hosp[df_hosp['tipo'].isin(['hospital', 'clinica'])]
 
             hosp_coords = []
@@ -55,17 +80,17 @@ class EmergencyLocator:
             if hosp_coords:
                 self.hospital_tree = KDTree(hosp_coords)
                 print(f"[EmergencyLocator] {len(hosp_coords)} Hospitales/Clínicas indexados.")
+        else:
+            print(f"[ERROR] Archivo de Hospitales no encontrado en: {hosp_path}")
 
     def get_nearest_cai(self, lon, lat):
         if not self.cai_tree:
             return None
-
         distance, index = self.cai_tree.query((lon, lat))
         return self.cai_data[index]
 
     def get_nearest_hospital(self, lon, lat):
         if not self.hospital_tree:
             return None
-
         distance, index = self.hospital_tree.query((lon, lat))
         return self.hospital_data[index]

@@ -152,15 +152,21 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
 
 
 @app.post("/api/emergency-route")
+@app.post("/api/emergency-route")
 def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
     start_lat, start_lon = request.origen[0], request.origen[1]
 
-    if request.tipo_emergencia == "cai":
+    # CORRECCIÓN: Convertir a minúsculas para evitar choques
+    tipo = request.tipo_emergencia.lower().strip()
+
+    if tipo == "cai":
         nearest_emergency = EMERGENCY_LOCATOR.get_nearest_cai(start_lon, start_lat)
-    elif request.tipo_emergencia == "hospital":
+    elif tipo == "hospital":
         nearest_emergency = EMERGENCY_LOCATOR.get_nearest_hospital(start_lon, start_lat)
     else:
         raise HTTPException(status_code=400, detail="Tipo de emergencia inválido.")
+
+    # ... (sigue el resto de la función igual)
 
     if not nearest_emergency:
         raise HTTPException(status_code=500, detail="No se pudieron cargar los datos de emergencia.")
@@ -197,7 +203,7 @@ def get_heatmap_data():
 
         for (lat, lon), risks in coord_risks.items():
             avg_risk = sum(risks) / len(risks)
-            heatmap_points.append([lat, lon, avg_risk * 0.3])
+            heatmap_points.append([lat, lon, avg_risk * 0.7])
 
         if len(heatmap_points) > 5000:
             heatmap_points = random.sample(heatmap_points, 5000)
