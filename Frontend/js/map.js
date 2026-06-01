@@ -1,5 +1,5 @@
 // ==========================================
-// map.js - Lógica visual de Leaflet (Líneas continuas y colores fuertes)
+// map.js - Lógica visual de Leaflet
 // ==========================================
 
 const map = L.map('mapa', {
@@ -36,17 +36,15 @@ const MapManager = {
         animationCounter++;
     },
 
-    // Ruta final (Línea sólida y gruesa para AMBOS algoritmos)
     drawRoute(routeCoords, colorHex) {
         const polyline = L.polyline(routeCoords, {
             color: colorHex,
-            weight: 7, // Bien gruesa
-            opacity: 1.0, // Cero transparencia
+            weight: 7,
+            opacity: 1.0,
             lineCap: 'round',
             lineJoin: 'round'
         }).addTo(map);
 
-        // Brillo blanco de fondo para que resalte incluso en el mapa de calor
         const glow = L.polyline(routeCoords, {
             color: '#ffffff', weight: 12, opacity: 0.6, lineCap: 'round', lineJoin: 'round'
         }).addTo(map);
@@ -55,7 +53,7 @@ const MapManager = {
         return polyline;
     },
 
-    // LA CARRERA (Colores Neón Fuertes)
+    // CORRECCIÓN CRÍTICA: Animación optimizada con desempaquetado de segmentos para Canvas
     animateRace(historyA, historyG, callbackTermino) {
         const currentAnimId = ++animationCounter;
 
@@ -70,33 +68,39 @@ const MapManager = {
         const chunkA = Math.ceil((historyA ? historyA.length : 0) / totalFrames) || 1;
         const chunkG = Math.ceil((historyG ? historyG.length : 0) / totalFrames) || 1;
 
-        // COLORES SÚPER FUERTES
-        const colorPulpo = "#00ffff";  // Cian eléctrico brillante (A*)
-        const colorCulebra = "#ff0055"; // Rojo/Fucsia muy fuerte (Greedy)
+        const colorPulpo = "#00ffff";
+        const colorCulebra = "#ff0055";
 
         function drawFrame() {
             if (currentAnimId !== animationCounter) return;
 
             let siguenPintando = false;
 
+            // Historial de A* (El Pulpo)
             if (historyA && indexA < historyA.length) {
                 const sliceA = historyA.slice(indexA, indexA + chunkA);
-                L.polyline(sliceA, {
-                    color: colorPulpo,
-                    weight: 3,
-                    opacity: 0.5 // Subimos opacidad para que se vea claro el "pulpo"
-                }).addTo(layerA);
+                // Iteramos por cada par de coordenadas [[lat1,lon1],[lat2,lon2]] para forzar el pintado
+                sliceA.forEach(segmento => {
+                    L.polyline(segmento, {
+                        color: colorPulpo,
+                        weight: 3,
+                        opacity: 0.5
+                    }).addTo(layerA);
+                });
                 indexA += chunkA;
                 siguenPintando = true;
             }
 
+            // Historial de Greedy (La Culebra)
             if (historyG && indexG < historyG.length) {
                 const sliceG = historyG.slice(indexG, indexG + chunkG);
-                L.polyline(sliceG, {
-                    color: colorCulebra,
-                    weight: 4,
-                    opacity: 0.9 // Casi sólido para la culebra
-                }).addTo(layerG);
+                sliceG.forEach(segmento => {
+                    L.polyline(segmento, {
+                        color: colorCulebra,
+                        weight: 4,
+                        opacity: 0.8
+                    }).addTo(layerG);
+                });
                 indexG += chunkG;
                 siguenPintando = true;
             }
@@ -104,7 +108,6 @@ const MapManager = {
             if (siguenPintando) {
                 requestAnimationFrame(drawFrame);
             } else {
-                // Al terminar, bajamos la luz de la búsqueda un poco y llamamos la ruta final
                 layerA.eachLayer(l => l.setStyle({ opacity: 0.15 }));
                 layerG.eachLayer(l => l.setStyle({ opacity: 0.3 }));
                 if (callbackTermino) callbackTermino();
@@ -114,19 +117,18 @@ const MapManager = {
         requestAnimationFrame(drawFrame);
     },
 
-    // MAPA DE CALOR: Parámetros forzados para que sea ultra visible
     renderHeatmap(puntos) {
         return L.heatLayer(puntos, {
-            radius: 35,       // Más grande para tapar bien la zona
-            blur: 30,         // Suavizado
+            radius: 25,
+            blur: 15,
             maxZoom: 16,
             max: 1.0,
-            minOpacity: 0.6,  // Nunca será invisible
+            minOpacity: 0.5,
             gradient: {
-                0.3: '#2563eb', // Azul
-                0.5: '#10b981', // Verde
-                0.7: '#f59e0b', // Naranja
-                1.0: '#ef4444'  // Rojo Fuerte
+                0.2: '#0000ff', // Azul zonas seguras
+                0.5: '#00ff00', // Verde
+                0.8: '#ffff00', // Amarillo
+                1.0: '#ff0000'  // Rojo zonas calientes
             }
         });
     }

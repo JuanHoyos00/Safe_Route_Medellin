@@ -5,6 +5,9 @@
 const BASE_URL = 'https://saferoutemedellin-production.up.railway.app/api';
 
 const SafeRouteAPI = {
+    // CORRECCIÓN CRÍTICA: Exponer la URL para que app.js la pueda leer correctamente
+    BASE_URL: BASE_URL,
+
     async calculateRoute(origen, destino, alpha, beta, mode = "both") {
         try {
             const response = await fetch(`${BASE_URL}/calculate-routes`, {
@@ -15,7 +18,7 @@ const SafeRouteAPI = {
                     destino: destino,
                     alpha: parseFloat(alpha),
                     beta: parseFloat(beta),
-                    mode: mode // <--- AHORA ENVIAMOS EL MODO DINÁMICO
+                    mode: mode
                 })
             });
 
@@ -36,7 +39,7 @@ const SafeRouteAPI = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     origen: origen,
-                    tipo_emergencia: tipo, // "cai" o "hospital"
+                    tipo_emergencia: tipo,
                     alpha: parseFloat(alpha),
                     beta: parseFloat(beta),
                     mode: "both"
