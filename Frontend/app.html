@@ -72,20 +72,16 @@
                 </div>
             </div>
 
-            <button id="btn-limpiar" class="btn-secondary-small"><i class="fa-solid fa-trash-can"></i> Limpiar Mapa</button>
+            <button id="btn-limpiar" class="btn-secondary-small" style="margin-bottom: 10px;"><i class="fa-solid fa-trash-can"></i> Limpiar Mapa</button>
 
             <hr>
 
             <div class="input-group" style="margin-bottom: 15px;">
-                <label><i class="fa-solid fa-layer-group" style="color: #4b5563;"></i> Capas y Visualización</label>
+                <label><i class="fa-solid fa-layer-group" style="color: #4b5563;"></i> Capas del Mapa</label>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px; font-size: 0.9rem;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <input type="checkbox" id="chk-mapa-calor">
                         <span><i class="fa-solid fa-fire" style="color: #dc2626;"></i> Ver Mapa de Calor (Riesgo CSV)</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" id="chk-animar-ruta" checked>
-                        <span><i class="fa-solid fa-film" style="color: #d97706;"></i> Mostrar Animación de búsqueda</span>
                     </label>
                 </div>
             </div>
@@ -101,11 +97,14 @@
                 </div>
             </div>
 
-            <button id="btn-calcular" class="btn-main"><i class="fa-solid fa-route"></i> Calcular Ruta Segura</button>
-
-            <button id="btn-saltar-animacion" class="btn-main hidden" style="background-color: #d97706; margin-top: 8px;">
-                <i class="fa-solid fa-forward"></i> Mostrar ya de una
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <button id="btn-buscar-animado" class="btn-main" style="background-color: #2563eb;">
+                    <i class="fa-solid fa-play"></i> Iniciar búsqueda animada
+                </button>
+                <button id="btn-mostrar-instantaneo" class="btn-main" style="background-color: #10b981;">
+                    <i class="fa-solid fa-bolt"></i> Mostrar ruta de una vez
+                </button>
+            </div>
 
             <hr>
 

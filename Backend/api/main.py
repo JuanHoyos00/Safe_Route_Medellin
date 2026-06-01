@@ -1,4 +1,6 @@
+import os
 import time
+import pandas as pd
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -169,28 +171,27 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
 
     return response_data
 
-
-import pandas as pd
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-
-# ... (Todo tu código original de FastAPI se mantiene arriba)
-
-@app.get("/api/heatmap")
+@app.get("/api/heatmap")  # Aseguramos el prefijo /api para acoplarse con SafeRouteAPI
 def get_heatmap_data():
     try:
-        # Cargamos tu archivo CSV directamente
-        df = pd.read_csv("unified_medellin_data.csv")
+        # Encontrar la raíz del proyecto dinámicamente desde Backend/api/main.py
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Retrocedemos dos niveles hacia Safe_Route_Medellin y entramos a Data/
+        csv_path = os.path.normpath(os.path.join(current_dir, "../../Data/unified_medellin_data.csv"))
 
-        # Filtramos columnas esenciales y quitamos nulos para no saturar la red
+        if not os.path.exists(csv_path):
+            # Intento de respaldo si tu entorno de ejecución inicia directamente desde la raíz
+            csv_path = "Data/unified_medellin_data.csv"
+
+        df = pd.read_csv(csv_path)
+
+        # Limpiamos nulos de geolocalización
         df_clean = df[['lat', 'lon', 'combined_cost']].dropna()
 
-        # Opcional: Si el CSV es gigante (más de 20k filas), lo muestreamos para que cargue volando
-        if len(df_clean) > 10000:
-            df_clean = df_clean.sample(n=5000, random_state=42)
+        # Si el set de datos es muy pesado, tomamos una muestra equilibrada para optimizar la carga del mapa
+        if len(df_clean) > 8000:
+            df_clean = df_clean.sample(n=4000, random_state=42)
 
-        # Normalizamos el costo combinado entre 0 y 1 para la intensidad del mapa de calor
         max_cost = df_clean['combined_cost'].max()
         min_cost = df_clean['combined_cost'].min()
 
@@ -199,9 +200,7 @@ def get_heatmap_data():
         else:
             df_clean['weight'] = 0.5
 
-        # Convertimos a la lista que Leaflet espera: [[lat, lon, peso], ...]
-        data_json = df_clean[['lat', 'lon', 'weight']].values.tolist()
-        return data_json
+        return df_clean[['lat', 'lon', 'weight']].values.tolist()
 
     except Exception as e:
-        return {"error": f"No se pudo procesar el archivo CSV: {str(e)}"}
+        return {"error": f"Fallo al procesar CSV en la ruta establecida: {str(e)}"}
