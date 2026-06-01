@@ -5,7 +5,6 @@
 const BASE_URL = 'https://saferoutemedellin-production.up.railway.app/api';
 
 const SafeRouteAPI = {
-    // CORRECCIÓN CRÍTICA: Exponer la URL para que app.js la pueda leer correctamente
     BASE_URL: BASE_URL,
 
     async calculateRoute(origen, destino, alpha, beta, mode = "both") {
@@ -32,7 +31,8 @@ const SafeRouteAPI = {
         }
     },
 
-    async calculateEmergencyRoute(origen, tipo, alpha, beta) {
+    // AHORA SÍ RECIBE Y ENVÍA EL MODO
+    async calculateEmergencyRoute(origen, tipo, alpha, beta, mode = "both") {
         try {
             const response = await fetch(`${BASE_URL}/emergency-route`, {
                 method: 'POST',
@@ -42,7 +42,7 @@ const SafeRouteAPI = {
                     tipo_emergencia: tipo,
                     alpha: parseFloat(alpha),
                     beta: parseFloat(beta),
-                    mode: "both"
+                    mode: mode
                 })
             });
 
@@ -51,7 +51,7 @@ const SafeRouteAPI = {
 
         } catch (error) {
             console.error("[API] Error:", error);
-            alert("Error al buscar la emergencia.");
+            alert("Error al buscar la emergencia. Verifica que el punto esté dentro de la ciudad.");
             return null;
         }
     }

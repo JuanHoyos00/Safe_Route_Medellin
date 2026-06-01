@@ -53,7 +53,6 @@ const MapManager = {
         return polyline;
     },
 
-    // CORRECCIÓN CRÍTICA: Animación optimizada con desempaquetado de segmentos para Canvas
     animateRace(historyA, historyG, callbackTermino) {
         const currentAnimId = ++animationCounter;
 
@@ -76,10 +75,8 @@ const MapManager = {
 
             let siguenPintando = false;
 
-            // Historial de A* (El Pulpo)
             if (historyA && indexA < historyA.length) {
                 const sliceA = historyA.slice(indexA, indexA + chunkA);
-                // Iteramos por cada par de coordenadas [[lat1,lon1],[lat2,lon2]] para forzar el pintado
                 sliceA.forEach(segmento => {
                     L.polyline(segmento, {
                         color: colorPulpo,
@@ -91,7 +88,6 @@ const MapManager = {
                 siguenPintando = true;
             }
 
-            // Historial de Greedy (La Culebra)
             if (historyG && indexG < historyG.length) {
                 const sliceG = historyG.slice(indexG, indexG + chunkG);
                 sliceG.forEach(segmento => {
@@ -119,16 +115,16 @@ const MapManager = {
 
     renderHeatmap(puntos) {
         return L.heatLayer(puntos, {
-            radius: 25,
-            blur: 15,
+            radius: 20,
+            blur: 25,
             maxZoom: 16,
-            max: 1.0,
-            minOpacity: 0.5,
+            max: 3.0,
+            minOpacity: 0.1,
             gradient: {
-                0.2: '#0000ff', // Azul zonas seguras
-                0.5: '#00ff00', // Verde
-                0.8: '#ffff00', // Amarillo
-                1.0: '#ff0000'  // Rojo zonas calientes
+                0.2: '#0000ff',
+                0.5: '#00ff00',
+                0.7: '#ffff00',
+                1.0: '#ff0000'
             }
         });
     }

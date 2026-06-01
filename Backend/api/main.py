@@ -12,6 +12,7 @@ from Backend.models.graph import build_medellin_graph
 from Backend.core.pathfinding_a_star_algorithm import algorithm_a_star
 from Backend.core.pathfinding_greedy_algorithm import algorithm_greedy
 from Backend.core.emergency_locator import EmergencyLocator
+from Backend.utils.math_utils import haversine_distance
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CSV_PATH = os.path.join(BASE_DIR, "Data", "unified_medellin_data.csv")
@@ -59,10 +60,19 @@ app.add_middleware(
 
 def find_nearest_node(lat: float, lon: float) -> Any:
     target = (lon, lat)
-    print(f"[KDTree] Buscando vecino más cercano para el click -> Lat: {lat}, Lon: {lon}")
     _, index = DATA_TREE.query(target)
     chosen_node = NODES_LIST[index]
-    print(f"[KDTree] Nodo asignado -> Lon: {chosen_node[0]}, Lat: {chosen_node[1]}")
+
+    # Calculamos distancia real entre el clic y el nodo encontrado
+    distancia_metros = haversine_distance(target, chosen_node)
+
+    # Límite de 3 km. Si es mayor, el punto es fuera de Medellín.
+    if distancia_metros > 3000:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Punto fuera de cobertura. El nodo más cercano está a {round(distancia_metros / 1000, 1)} km."
+        )
+
     return chosen_node
 
 
@@ -72,7 +82,7 @@ class RouteRequest(BaseModel):
     alpha: float
     beta: float
     mode: str = "both"
-    algorithm: str = None  # Tolerancia por si el frontend usa 'algorithm'
+    algorithm: str = None
 
 
 class EmergencyRequest(BaseModel):
@@ -81,7 +91,7 @@ class EmergencyRequest(BaseModel):
     alpha: float
     beta: float
     mode: str = "both"
-    algorithm: str = None  # Tolerancia por si el frontend usa 'algorithm'
+    algorithm: str = None
 
 
 @app.post("/api/calculate-routes")
@@ -92,7 +102,6 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
     origin_node = find_nearest_node(start_lat, start_lon)
     destination_node = find_nearest_node(end_lat, end_lon)
 
-    # Normalizamos el modo para aceptar 'a_star', 'astar', 'A*', etc.
     raw_mode = request.algorithm if request.algorithm else request.mode
     mode = raw_mode.lower().strip().replace("_", "")
 
@@ -156,7 +165,6 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
     if not nearest_emergency:
         raise HTTPException(status_code=500, detail="No se pudieron cargar los datos de emergencia.")
 
-    # Mantenemos el algoritmo seleccionado por el usuario para la ruta final
     route_request = RouteRequest(
         origen=(start_lat, start_lon),
         destino=(nearest_emergency['lat'], nearest_emergency['lon']),
@@ -178,21 +186,17 @@ def get_heatmap_data():
     if GRAPH is not None:
         coord_risks = {}
 
-        # Agrupamos por coordenada para evitar la superposición masiva de aristas
         for u, v, data in GRAPH.edges(data=True):
             lon, lat = u[0], u[1]
             risk = float(data.get('harassmentRisk', 0.5))
 
-            # Redondeamos a 5 decimales (~1 metro de precisión) para consolidar cruces
             geo_key = (round(lat, 5), round(lon, 5))
             if geo_key not in coord_risks:
                 coord_risks[geo_key] = []
             coord_risks[geo_key].append(risk)
 
-        # Generamos los puntos promediados y suavizados
         for (lat, lon), risks in coord_risks.items():
             avg_risk = sum(risks) / len(risks)
-            # Factor de suavizado (0.3) para que la mancha no se sature de rojo intenso
             heatmap_points.append([lat, lon, avg_risk * 0.3])
 
         if len(heatmap_points) > 5000:
