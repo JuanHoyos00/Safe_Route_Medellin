@@ -2,7 +2,7 @@
 // api.js - Comunicación con el Backend
 // ==========================================
 
-const BASE_URL = 'saferoutemedellin-production.up.railway.app';
+const BASE_URL = 'https://saferoutemedellin-production.up.railway.app/api';
 
 const SafeRouteAPI = {
     async calculateRoute(origen, destino, alpha, beta, mode = "both") {
