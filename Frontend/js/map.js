@@ -121,10 +121,10 @@ const MapManager = {
             max: 3.0,
             minOpacity: 0.1,
             gradient: {
-                0.2: '#0000ff',
-                0.5: '#00ff00',
-                0.7: '#ffff00',
-                1.0: '#ff0000'
+                0.4: '#00ff00', // Verde (Zonas seguras)
+                0.7: '#ffff00', // Amarillo (Riesgo medio)
+                0.9: '#ff8c00', // Naranja (Riesgo alto)
+                1.0: '#ff0000'  // Rojo (Riesgo máximo)
             }
         });
     }

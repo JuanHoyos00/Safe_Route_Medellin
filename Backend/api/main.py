@@ -66,8 +66,8 @@ def find_nearest_node(lat: float, lon: float) -> Any:
     # Calculamos distancia real entre el clic y el nodo encontrado
     distancia_metros = haversine_distance(target, chosen_node)
 
-    # Límite de 3 km. Si es mayor, el punto es fuera de Medellín.
-    if distancia_metros > 3000:
+    # Límite de 200 km. Si es mayor, el punto es fuera de Medellín.
+    if distancia_metros > 200000:
         raise HTTPException(
             status_code=400,
             detail=f"Punto fuera de cobertura. El nodo más cercano está a {round(distancia_metros / 1000, 1)} km."
