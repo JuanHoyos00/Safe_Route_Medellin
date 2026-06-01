@@ -1,5 +1,5 @@
 // ==========================================
-// app.js - Control de Interfaz de Usuario Avanzado
+// app.js - Control de Interfaz de Usuario (Corregido)
 // ==========================================
 
 let estadoClick = 'origen';
@@ -7,10 +7,9 @@ let coordsOrigen = null;
 let coordsDestino = null;
 let mapaBloqueado = false;
 
-// Variables globales para el manejo de animaciones y datos temporales
 let esAnimandoActualmente = false;
-let datosUltimaRespuesta = null; // Guardará el JSON del backend para el botón "Mostrar ya de una"
-let capaMapaCalor = null;        // Instancia del mapa de calor de Leaflet
+let datosUltimaRespuesta = null;
+let capaMapaCalor = null;
 
 // Referencias del DOM
 const origenInput = document.getElementById('origen-input');
@@ -22,14 +21,14 @@ const panelLateral = document.getElementById('panel-lateral');
 const toggleBtn = document.getElementById('toggle-panel');
 const algoSelect = document.getElementById('algo-select');
 
-// Nuevas Referencias del DOM
+// Nuevas Opciones
 const barrioOrigenSelect = document.getElementById('barrio-origen-select');
 const barrioDestinoSelect = document.getElementById('barrio-destino-select');
 const chkMapaCalor = document.getElementById('chk-mapa-calor');
 const chkAnimarRuta = document.getElementById('chk-animar-ruta');
 const btnSaltarAnimacion = document.getElementById('btn-saltar-animacion');
 
-// 1. LÓGICA DE OCULTAR/MOSTRAR PANEL
+// 1. OCULTAR/MOSTRAR PANEL LATERAL
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
         panelLateral.classList.toggle('oculto');
@@ -43,7 +42,7 @@ if (toggleBtn) {
     });
 }
 
-// 2. LÓGICA DEL SLIDER ÚNICO
+// 2. CONFIGURACIÓN DEL SLIDER ÚNICO
 if (rutaSlider) {
     rutaSlider.addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
@@ -55,11 +54,9 @@ if (rutaSlider) {
     });
 }
 
-// 3. CLICS EN EL MAPA (CON SINCRONIZACIÓN)
+// 3. SELECCIÓN POR CLICS EN EL MAPA (SINCRONIZADA)
 map.on('click', function(e) {
-    if (mapaBloqueado) {
-        return alert("Ya elegiste los puntos. Haz clic en 'Limpiar Mapa' para seleccionar otra ruta.");
-    }
+    if (mapaBloqueado) return;
 
     const lat = parseFloat(e.latlng.lat.toFixed(6));
     const lon = parseFloat(e.latlng.lng.toFixed(6));
@@ -68,18 +65,18 @@ map.on('click', function(e) {
         coordsOrigen = [lat, lon];
         MapManager.setOrigin(lat, lon);
         origenInput.value = `${lat}, ${lon}`;
-        barrioOrigenSelect.value = ""; // Sincroniza: quita la selección por barrio
+        barrioOrigenSelect.value = "";
         estadoClick = 'destino';
     } else {
         coordsDestino = [lat, lon];
         MapManager.setDestination(lat, lon);
         destinoInput.value = `${lat}, ${lon}`;
-        barrioDestinoSelect.value = ""; // Sincroniza
+        barrioDestinoSelect.value = "";
         mapaBloqueado = true;
     }
 });
 
-// 4. LÓGICA DE GPS (CON SINCRONIZACIÓN)
+// 4. SELECCIÓN POR GPS (SINCRONIZADA)
 function obtenerGPS(inputElement, esOrigen, selectAsociado) {
     if (mapaBloqueado) return alert("Limpia el mapa primero.");
     if (!navigator.geolocation) return alert("Tu navegador no soporta GPS.");
@@ -99,17 +96,19 @@ function obtenerGPS(inputElement, esOrigen, selectAsociado) {
                 mapaBloqueado = true;
             }
             inputElement.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-            selectAsociado.value = ""; // Sincroniza: Limpia el atajo por barrio ya que usó GPS
+            selectAsociado.value = "";
             map.setView([lat, lon], 16);
         },
-        (error) => alert("No pudimos acceder a tu ubicación.")
+        () => {
+            alert("No pudimos acceder a tu ubicación.");
+            inputElement.value = "";
+        }
     );
 }
-
 document.getElementById('btn-gps-origen').addEventListener('click', () => obtenerGPS(origenInput, true, barrioOrigenSelect));
 document.getElementById('btn-gps-destino').addEventListener('click', () => obtenerGPS(destinoInput, false, barrioDestinoSelect));
 
-// 4.1 NUEVO: LOGICA DE ATAJOS POR BARRIOS (CON SINCRONIZACIÓN)
+// 5. ATAJOS POR BARRIOS (SINCRONIZADA)
 barrioOrigenSelect.addEventListener('change', (e) => {
     if (mapaBloqueado) {
         barrioOrigenSelect.value = "";
@@ -117,13 +116,11 @@ barrioOrigenSelect.addEventListener('change', (e) => {
     }
     if (e.target.value) {
         const partes = e.target.value.split(',');
-        const lat = parseFloat(partes[0]);
-        const lon = parseFloat(partes[1]);
-        coordsOrigen = [lat, lon];
-        MapManager.setOrigin(lat, lon);
-        origenInput.value = `${lat}, ${lon}`;
+        coordsOrigen = [parseFloat(partes[0]), parseFloat(partes[1])];
+        MapManager.setOrigin(coordsOrigen[0], coordsOrigen[1]);
+        origenInput.value = `${coordsOrigen[0]}, ${coordsOrigen[1]}`;
         estadoClick = 'destino';
-        map.setView(coordsOrigen, 14);
+        map.setView(coordsOrigen, 15);
     }
 });
 
@@ -134,23 +131,24 @@ barrioDestinoSelect.addEventListener('change', (e) => {
     }
     if (e.target.value) {
         const partes = e.target.value.split(',');
-        const lat = parseFloat(partes[0]);
-        const lon = parseFloat(partes[1]);
-        coordsDestino = [lat, lon];
-        MapManager.setDestination(lat, lon);
-        destinoInput.value = `${lat}, ${lon}`;
+        coordsDestino = [parseFloat(partes[0]), parseFloat(partes[1])];
+        MapManager.setDestination(coordsDestino[0], coordsDestino[1]);
+        destinoInput.value = `${coordsDestino[0]}, ${coordsDestino[1]}`;
         mapaBloqueado = true;
-        map.setView(coordsDestino, 14);
+        map.setView(coordsDestino, 15);
     }
 });
 
-// 5. LIMPIAR MAPA (RESTABLECE TODO)
+// 6. BOTÓN LIMPIAR MAPA (CORREGIDO - RESTABLECE TODO SIN ERRORES)
 document.getElementById('btn-limpiar').addEventListener('click', () => {
-    // Detener animaciones si las hay corriendo en MapManager de fondo
+    // Forzar la detención de cualquier temporizador activo en el navegador
     if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
     if (window.routeTimeout) clearTimeout(window.routeTimeout);
 
+    // Limpieza nativa a través del manager
     MapManager.clearRoutes();
+
+    // Remover marcadores remanentes de Leaflet de forma segura
     map.eachLayer((layer) => {
         if (layer instanceof L.Marker) map.removeLayer(layer);
     });
@@ -181,7 +179,7 @@ function parsearEntradaManual(texto) {
     return null;
 }
 
-// 7. BOTÓN PRINCIPAL: CALCULAR RUTAS
+// 7. CALCULAR RUTA
 document.getElementById('btn-calcular').addEventListener('click', async () => {
     if (origenInput.value) coordsOrigen = parsearEntradaManual(origenInput.value) || coordsOrigen;
     if (destinoInput.value) coordsDestino = parsearEntradaManual(destinoInput.value) || coordsDestino;
@@ -190,7 +188,6 @@ document.getElementById('btn-calcular').addEventListener('click', async () => {
         return alert("Asegúrate de ingresar un origen y un destino válidos.");
     }
 
-    // Si le da calcular a mitad de una animación vieja, limpiamos intervalos
     if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
     if (window.routeTimeout) clearTimeout(window.routeTimeout);
 
@@ -207,12 +204,120 @@ document.getElementById('btn-calcular').addEventListener('click', async () => {
     document.getElementById('btn-calcular').innerHTML = '<i class="fa-solid fa-route"></i> Calcular Ruta Segura';
 
     if (data) {
-        datosUltimaRespuesta = data; // Guardamos en memoria por si quiere "saltar"
+        datosUltimaRespuesta = data;
         procesarRespuesta(data, modo);
     }
 });
 
-// 8. BOTONES DE EMERGENCIA
+// 8. PROCESAR RESPUESTA Y ANIMACIONES (CORREGIDO UTILIZANDO EL ENTORNO NATIVO)
+function procesarRespuesta(data, modo) {
+    if(data.origin) MapManager.setOrigin(data.origin[0], data.origin[1]);
+    if(data.destination) MapManager.setDestination(data.destination[0], data.destination[1]);
+
+    statsPanel.classList.remove('hidden');
+
+    document.getElementById('wrap-astar').style.display = (modo === 'both' || modo === 'astar') ? 'block' : 'none';
+    document.getElementById('wrap-greedy').style.display = (modo === 'both' || modo === 'greedy') ? 'block' : 'none';
+
+    if (data.greedy) {
+        document.getElementById('stat-greedy').innerText = (data.greedy.execution_time * 1000).toFixed(2);
+        document.getElementById('nodes-greedy').innerText = data.greedy.explored_nodes;
+    }
+    if (data.a_star) {
+        document.getElementById('stat-astar').innerText = (data.a_star.execution_time * 1000).toFixed(2);
+        document.getElementById('nodes-astar').innerText = data.a_star.explored_nodes;
+    }
+
+    if (chkAnimarRuta.checked) {
+        esAnimandoActualmente = true;
+        btnSaltarAnimacion.classList.remove('hidden');
+
+        if (data.greedy) {
+            MapManager.animateExploration(data.greedy.history_visited, "#ef4444");
+            MapManager.drawRoute(data.greedy.route, "#ef4444", true); // True activa animación nativa
+        }
+        if (data.a_star) {
+            MapManager.animateExploration(data.a_star.history_visited, "#2563eb");
+            MapManager.drawRoute(data.a_star.route, "#2563eb", true);
+        }
+
+        const maxNodos = Math.max(
+            data.greedy ? data.greedy.history_visited.length : 0,
+            data.a_star ? data.a_star.history_visited.length : 0
+        );
+        setTimeout(() => {
+            esAnimandoActualmente = false;
+            btnSaltarAnimacion.classList.add('hidden');
+        }, (maxNodos * 10) + 500);
+
+    } else {
+        pintarTodoInstantaneo(data);
+    }
+}
+
+// FUNCIÓN PARA RENDERIZAR DE FORMA INMEDIATA USANDO MAPMANAGER SIN ENREDAR CAPAS EXTERNAS
+function pintarTodoInstantaneo(data) {
+    esAnimandoActualmente = false;
+    btnSaltarAnimacion.classList.add('hidden');
+
+    if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
+    if (window.routeTimeout) clearTimeout(window.routeTimeout);
+    MapManager.clearRoutes();
+
+    // Enviamos el tercer parámetro en `false` para que pinte la polilínea nativa al instante
+    if (data.greedy && data.greedy.route) {
+        MapManager.drawRoute(data.greedy.route, "#ef4444", false);
+    }
+    if (data.a_star && data.a_star.route) {
+        MapManager.drawRoute(data.a_star.route, "#2563eb", false);
+    }
+}
+
+// ACCIÓN DEL BOTÓN INTERRUPTOR "MOSTRAR YA DE UNA"
+btnSaltarAnimacion.addEventListener('click', () => {
+    if (esAnimandoActualmente && datosUltimaRespuesta) {
+        pintarTodoInstantaneo(datosUltimaRespuesta);
+    }
+});
+
+// 9. MAPA DE CALOR CONECTADO AL SERVIDOR EN VIVO (OPCIÓN INDEPENDIENTE)
+chkMapaCalor.addEventListener('change', async (e) => {
+    if (e.target.checked) {
+        if (!capaMapaCalor) {
+            try {
+                // Hacemos el llamado a la URL base de tu Railway para traer los costos del CSV original
+                const response = await fetch(`${SafeRouteAPI.BASE_URL}/heatmap`);
+                if (!response.ok) throw new Error("No se pudo obtener el heatmap del servidor.");
+
+                const puntosCSV = await response.json();
+                // Se espera estructura limpia desde backend: [[lat, lon, combined_cost], ...]
+
+                capaMapaCalor = L.heatLayer(puntosCSV, {
+                    radius: 30,
+                    blur: 18,
+                    maxZoom: 15,
+                    gradient: {0.2: 'blue', 0.5: 'lime', 0.8: 'orange', 1.0: 'red'}
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Error al cargar los costos combinados. Cargando simulación local de seguridad.");
+                // Respaldo preventivo si el endpoint de backend no está arriba
+                const puntosFallback = [
+                    [6.2442, -75.5714, 0.9], [6.2460, -75.5670, 0.8],
+                    [6.2625, -75.5510, 0.85], [6.2100, -75.5650, 0.2]
+                ];
+                capaMapaCalor = L.heatLayer(puntosFallback, { radius: 30, blur: 18 });
+            }
+        }
+        capaMapaCalor.addTo(map);
+    } else {
+        if (capaMapaCalor) {
+            map.removeLayer(capaMapaCalor);
+        }
+    }
+});
+
+// 10. RUTAS DE EMERGENCIA
 async function ejecutarEmergencia(tipo) {
     if (origenInput.value) coordsOrigen = parsearEntradaManual(origenInput.value) || coordsOrigen;
     if (!coordsOrigen) return alert("Primero define tu origen.");
@@ -239,122 +344,5 @@ async function ejecutarEmergencia(tipo) {
         procesarRespuesta(data, modo);
     }
 }
-
 document.getElementById('btn-cai').addEventListener('click', () => ejecutarEmergencia('cai'));
 document.getElementById('btn-hosp').addEventListener('click', () => ejecutarEmergencia('hospital'));
-
-// 9. FUNCIÓN PARA PROCESAR LA RESPUESTA (CON INTERRUPTOR DE ANIMACIÓN)
-function procesarRespuesta(data, modo) {
-    if(data.origin) MapManager.setOrigin(data.origin[0], data.origin[1]);
-    if(data.destination) MapManager.setDestination(data.destination[0], data.destination[1]);
-
-    statsPanel.classList.remove('hidden');
-
-    document.getElementById('wrap-astar').style.display = (modo === 'both' || modo === 'astar') ? 'block' : 'none';
-    document.getElementById('wrap-greedy').style.display = (modo === 'both' || modo === 'greedy') ? 'block' : 'none';
-
-    // Actualizar datos de texto de rendimiento de una
-    if (data.greedy) {
-        document.getElementById('stat-greedy').innerText = (data.greedy.execution_time * 1000).toFixed(2);
-        document.getElementById('nodes-greedy').innerText = data.greedy.explored_nodes;
-    }
-    if (data.a_star) {
-        document.getElementById('stat-astar').innerText = (data.a_star.execution_time * 1000).toFixed(2);
-        document.getElementById('nodes-astar').innerText = data.a_star.explored_nodes;
-    }
-
-    const activarAnimacion = chkAnimarRuta.checked;
-
-    if (activarAnimacion) {
-        esAnimandoActualmente = true;
-        btnSaltarAnimacion.classList.remove('hidden'); // Mostramos botón de salto rápido
-
-        // Ejecutar con animación nativa de MapManager
-        if (data.greedy) {
-            MapManager.animateExploration(data.greedy.history_visited, "#ef4444");
-            MapManager.drawRoute(data.greedy.route, "#ef4444", true);
-        }
-        if (data.a_star) {
-            MapManager.animateExploration(data.a_star.history_visited, "#2563eb");
-            MapManager.drawRoute(data.a_star.route, "#2563eb", false);
-        }
-
-        // Programar cuando se asume que termina la animación para ocultar el botón
-        // Usamos un estimado basado en la longitud de nodos de exploración
-        const maxNodos = Math.max(
-            data.greedy ? data.greedy.history_visited.length : 0,
-            data.a_star ? data.a_star.history_visited.length : 0
-        );
-        setTimeout(() => {
-            esAnimandoActualmente = false;
-            btnSaltarAnimacion.classList.add('hidden');
-        }, maxNodos * 10 + 1000); // Mismo paso del time que use tu map.js
-
-    } else {
-        // MODO INSTANTÁNEO: Pintar todo de una vez sin pasar por history_visited
-        pintarTodoInstantaneo(data);
-    }
-}
-
-// FUNCIÓN AUXILIAR PARA DIBUJAR DE UNA SOLA VEZ
-function pintarTodoInstantaneo(data) {
-    esAnimandoActualmente = false;
-    btnSaltarAnimacion.classList.add('hidden');
-
-    // Forzar limpieza de hilos de animación que queden colgados
-    if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
-    if (window.routeTimeout) clearTimeout(window.routeTimeout);
-    MapManager.clearRoutes();
-
-    if (data.greedy && data.greedy.route) {
-        // Creamos la polilínea directa usando Leaflet global ya que MapManager oculta la opción instantánea
-        let poly = L.polyline(data.greedy.route, {color: "#ef4444", weight: 5, opacity: 0.8}).addTo(map);
-        window.greedyRouteLines = window.greedyRouteLines || [];
-        window.greedyRouteLines.push(poly);
-    }
-    if (data.a_star && data.a_star.route) {
-        let poly = L.polyline(data.a_star.route, {color: "#2563eb", weight: 5, opacity: 0.8}).addTo(map);
-        window.astarRouteLines = window.astarRouteLines || [];
-        window.astarRouteLines.push(poly);
-        map.fitBounds(poly.getBounds()); // Centrar cámara al final
-    }
-}
-
-// ESCUCHADOR DEL BOTÓN "MOSTRAR YA DE UNA"
-btnSaltarAnimacion.addEventListener('click', () => {
-    if (esAnimandoActualmente && datosUltimaRespuesta) {
-        pintarTodoInstantaneo(datosUltimaRespuesta);
-    }
-});
-
-// 10. NUEVO: CONFIGURACIÓN DEL MAPA DE CALOR (ZONAS DE RIESGO MEDELLÍN)
-// Estructura: [lat, lon, intensidad_riesgo]
-const puntosCalorMedellin = [
-    [6.2442, -75.5714, 0.9], // Centro (Riesgo Alto)
-    [6.2460, -75.5670, 0.85], // El de Estación San Antonio
-    [6.2625, -75.5510, 0.8],  // Manrique Central
-    [6.2680, -75.5650, 0.75], // Aranjuez
-    [6.2530, -75.5860, 0.4],  // Laureles (Riesgo Bajo-Medio)
-    [6.2100, -75.5650, 0.2]   // El Poblado (Riesgo Bajo)
-];
-
-chkMapaCalor.addEventListener('change', (e) => {
-    if (e.target.checked) {
-        // Inicializar si no existe
-        if (!capaMapaCalor) {
-            capaMapaCalor = L.heatLayer(puntosCalorMedellin, {
-                radius: 35,
-                blur: 20,
-                maxZoom: 16,
-                gradient: {0.2: 'blue', 0.4: 'lime', 0.7: 'orange', 1.0: 'red'}
-            });
-        }
-        capaMapaCalor.addTo(map);
-    } else {
-        if (capaMapaCalor) {
-            map.removeLayer(capaCalor);
-            // Si el código del plugin cambia, el método estándar de Leaflet es:
-            map.removeLayer(capaMapaCalor);
-        }
-    }
-});

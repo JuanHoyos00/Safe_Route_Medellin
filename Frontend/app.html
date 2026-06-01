@@ -35,10 +35,10 @@
             </div>
 
             <div class="input-group" style="background: #f3f4f6; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                <label style="font-weight: 600; font-size: 0.85rem;"><i class="fa-solid fa-tree-city" style="color: #059669;"></i> Atajos por Barrios</label>
+                <label style="font-weight: 600; font-size: 0.85rem; color: #374151;"><i class="fa-solid fa-tree-city" style="color: #059669;"></i> Atajos por Barrios</label>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <select id="barrio-origen-select" class="custom-select" style="font-size: 0.8rem; padding: 5px;">
-                        <option value="">-- Origen rápido --</option>
+                        <option value="">-- Origen barrio --</option>
                         <option value="6.2100,-75.5650">El Poblado</option>
                         <option value="6.2625,-75.5510">Manrique</option>
                         <option value="6.2442,-75.5714">Centro</option>
@@ -46,7 +46,7 @@
                         <option value="6.2307,-75.5898">Belén</option>
                     </select>
                     <select id="barrio-destino-select" class="custom-select" style="font-size: 0.8rem; padding: 5px;">
-                        <option value="">-- Destino rápido --</option>
+                        <option value="">-- Destino barrio --</option>
                         <option value="6.2100,-75.5650">El Poblado</option>
                         <option value="6.2625,-75.5510">Manrique</option>
                         <option value="6.2442,-75.5714">Centro</option>
@@ -77,15 +77,15 @@
             <hr>
 
             <div class="input-group" style="margin-bottom: 15px;">
-                <label><i class="fa-solid fa-layer-group" style="color: #4b5563;"></i> Opciones de Visualización</label>
+                <label><i class="fa-solid fa-layer-group" style="color: #4b5563;"></i> Capas y Visualización</label>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px; font-size: 0.9rem;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <input type="checkbox" id="chk-mapa-calor">
-                        <span><i class="fa-solid fa-fire" style="color: #dc2626;"></i> Mostrar Mapa de Calor (Riesgo)</span>
+                        <span><i class="fa-solid fa-fire" style="color: #dc2626;"></i> Ver Mapa de Calor (Riesgo CSV)</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <input type="checkbox" id="chk-animar-ruta" checked>
-                        <span><i class="fa-solid fa-film" style="color: #d97706;"></i> Activar Animación al Trazar</span>
+                        <span><i class="fa-solid fa-film" style="color: #d97706;"></i> Mostrar Animación de búsqueda</span>
                     </label>
                 </div>
             </div>

@@ -168,3 +168,40 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
     response_data["emergency_info"] = nearest_emergency
 
     return response_data
+
+
+import pandas as pd
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+
+# ... (Todo tu código original de FastAPI se mantiene arriba)
+
+@app.get("/api/heatmap")
+def get_heatmap_data():
+    try:
+        # Cargamos tu archivo CSV directamente
+        df = pd.read_csv("unified_medellin_data.csv")
+
+        # Filtramos columnas esenciales y quitamos nulos para no saturar la red
+        df_clean = df[['lat', 'lon', 'combined_cost']].dropna()
+
+        # Opcional: Si el CSV es gigante (más de 20k filas), lo muestreamos para que cargue volando
+        if len(df_clean) > 10000:
+            df_clean = df_clean.sample(n=5000, random_state=42)
+
+        # Normalizamos el costo combinado entre 0 y 1 para la intensidad del mapa de calor
+        max_cost = df_clean['combined_cost'].max()
+        min_cost = df_clean['combined_cost'].min()
+
+        if max_cost != min_cost:
+            df_clean['weight'] = (df_clean['combined_cost'] - min_cost) / (max_cost - min_cost)
+        else:
+            df_clean['weight'] = 0.5
+
+        # Convertimos a la lista que Leaflet espera: [[lat, lon, peso], ...]
+        data_json = df_clean[['lat', 'lon', 'weight']].values.tolist()
+        return data_json
+
+    except Exception as e:
+        return {"error": f"No se pudo procesar el archivo CSV: {str(e)}"}
