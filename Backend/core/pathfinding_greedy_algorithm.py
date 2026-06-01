@@ -28,11 +28,11 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
         history_visited.append((parent_node, current_node))
 
         if current_node == destination:
-            # CORRECCIÓN: Extraemos directamente lon, lat de la tupla del nodo
+            # Armamos el historial extrayendo lat y lon directo de la tupla
             history_coords = []
             for u, v in history_visited:
-                lon_u, lat_u = u
-                lon_v, lat_v = v
+                lon_u, lat_u = u[0], u[1]
+                lon_v, lat_v = v[0], v[1]
                 history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
 
             return current_route, current_cost, history_coords
@@ -40,8 +40,8 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
         for neighbor in graph.neighbors(current_node):
             if neighbor not in closed_set:
                 edge_data = graph.get_edge_data(current_node, neighbor)
-                normalized_length = edge_data['normalized_length']
-                base_risk = edge_data['harassmentRisk']
+                normalized_length = edge_data.get('normalized_length', 0.5)
+                base_risk = edge_data.get('harassmentRisk', 0.5)
                 cameras = edge_data.get('cameras_count', 0)
                 incidents = edge_data.get('incidents_count', 0)
 

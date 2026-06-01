@@ -34,7 +34,7 @@ async def lifespan(_fastapi_app: FastAPI):
     print(f"[API] Cargando grafo para Medellín desde {CSV_PATH}...")
     try:
         GRAPH = build_medellin_graph(CSV_PATH)
-        # TUS NODOS YA SON TUPLAS (lon, lat), así que los pasamos directo al KDTree
+        # Como los nodos YA SON tuplas (lon, lat), podemos pasarlos directico
         NODES_LIST = list(GRAPH.nodes)
         DATA_TREE = KDTree(NODES_LIST)
         print(f"[API] Grafo cargado exitosamente. {len(NODES_LIST)} nodos indexados.")
@@ -59,7 +59,8 @@ app.add_middleware(
 
 
 def find_nearest_node(lat: float, lon: float) -> Any:
-    target = (lon, lat)  # Tupla directa
+    # Ajustado al formato de los datos: (Longitud, Latitud)
+    target = (lon, lat)
     _, index = DATA_TREE.query(target)
     return NODES_LIST[index]
 
@@ -90,8 +91,9 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
 
     mode = request.mode
 
+    # Le damos la vuelta para el frontend [lat, lon]
     response_data: Dict[str, Any] = {
-        "origin": [origin_node[1], origin_node[0]],  # [lat, lon]
+        "origin": [origin_node[1], origin_node[0]],
         "destination": [destination_node[1], destination_node[0]],
         "a_star": None,
         "greedy": None
@@ -169,12 +171,11 @@ def get_heatmap_data():
     heatmap_points = []
     if GRAPH is not None:
         for u, v, data in GRAPH.edges(data=True):
-            # Como 'u' es una tupla, la desempaquetamos directamente
-            lon, lat = u
+            # 'u' ya es la tupla (lon, lat)
+            lon, lat = u[0], u[1]
             risk = float(data.get('harassmentRisk', 0.5))
             heatmap_points.append([lat, lon, risk])
 
-        # Muestra para no saturar la RAM del navegador
         if len(heatmap_points) > 5000:
             heatmap_points = random.sample(heatmap_points, 5000)
 
