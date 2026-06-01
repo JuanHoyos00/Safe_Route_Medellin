@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/map_style.css">
+    <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
 </head>
 <body>
 
@@ -33,6 +34,28 @@
                 </select>
             </div>
 
+            <div class="input-group" style="background: #f3f4f6; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <label style="font-weight: 600; font-size: 0.85rem;"><i class="fa-solid fa-tree-city" style="color: #059669;"></i> Atajos por Barrios</label>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <select id="barrio-origen-select" class="custom-select" style="font-size: 0.8rem; padding: 5px;">
+                        <option value="">-- Origen rápido --</option>
+                        <option value="6.2100,-75.5650">El Poblado</option>
+                        <option value="6.2625,-75.5510">Manrique</option>
+                        <option value="6.2442,-75.5714">Centro</option>
+                        <option value="6.2505,-75.5900">Laureles</option>
+                        <option value="6.2307,-75.5898">Belén</option>
+                    </select>
+                    <select id="barrio-destino-select" class="custom-select" style="font-size: 0.8rem; padding: 5px;">
+                        <option value="">-- Destino rápido --</option>
+                        <option value="6.2100,-75.5650">El Poblado</option>
+                        <option value="6.2625,-75.5510">Manrique</option>
+                        <option value="6.2442,-75.5714">Centro</option>
+                        <option value="6.2505,-75.5900">Laureles</option>
+                        <option value="6.2307,-75.5898">Belén</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="input-group">
                 <label><i class="fa-solid fa-location-dot" style="color: #2563eb;"></i> Origen (Escribe, GPS o mapa)</label>
                 <div class="location-controls">
@@ -53,6 +76,20 @@
 
             <hr>
 
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label><i class="fa-solid fa-layer-group" style="color: #4b5563;"></i> Opciones de Visualización</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px; font-size: 0.9rem;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk-mapa-calor">
+                        <span><i class="fa-solid fa-fire" style="color: #dc2626;"></i> Mostrar Mapa de Calor (Riesgo)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk-animar-ruta" checked>
+                        <span><i class="fa-solid fa-film" style="color: #d97706;"></i> Activar Animación al Trazar</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="sliders-container">
                 <div class="slider-group">
                     <label>Preferencia de Ruta: <span id="pref-value">Balanceada</span></label>
@@ -65,6 +102,10 @@
             </div>
 
             <button id="btn-calcular" class="btn-main"><i class="fa-solid fa-route"></i> Calcular Ruta Segura</button>
+
+            <button id="btn-saltar-animacion" class="btn-main hidden" style="background-color: #d97706; margin-top: 8px;">
+                <i class="fa-solid fa-forward"></i> Mostrar ya de una
+            </button>
 
             <hr>
 
