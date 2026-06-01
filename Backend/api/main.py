@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Tuple
+from scipy.spatial import KDTree
 
 from Backend.models.graph import build_medellin_graph
 from Backend.core.pathfinding_a_star_algorithm import algorithm_a_star
@@ -33,16 +34,9 @@ async def lifespan(_fastapi_app: FastAPI):
     print(f"[API] Cargando grafo para Medellín desde {CSV_PATH}...")
     try:
         GRAPH = build_medellin_graph(CSV_PATH)
+        # TUS NODOS YA SON TUPLAS (lon, lat), así que los pasamos directo al KDTree
         NODES_LIST = list(GRAPH.nodes)
-
-        # CORRECCIÓN: Extraer coordenadas X, Y reales para armar el KDTree, no los IDs
-        node_coords = [
-            [float(GRAPH.nodes[n].get('x', 0)), float(GRAPH.nodes[n].get('y', 0))]
-            for n in NODES_LIST
-        ]
-
-        from scipy.spatial import KDTree
-        DATA_TREE = KDTree(node_coords)
+        DATA_TREE = KDTree(NODES_LIST)
         print(f"[API] Grafo cargado exitosamente. {len(NODES_LIST)} nodos indexados.")
     except Exception as e:
         print(f"[ERROR CRÍTICO] No se pudo cargar el grafo: {e}")
@@ -65,9 +59,9 @@ app.add_middleware(
 
 
 def find_nearest_node(lat: float, lon: float) -> Any:
-    target = [lon, lat]  # El KDTree busca [X, Y]
+    target = (lon, lat)  # Tupla directa
     _, index = DATA_TREE.query(target)
-    return NODES_LIST[index]  # Devolvemos el ID del nodo encontrado
+    return NODES_LIST[index]
 
 
 class RouteRequest(BaseModel):
@@ -96,12 +90,9 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
 
     mode = request.mode
 
-    # CORRECCIÓN: Extraemos las coordenadas del diccionario de nodos, evitando el Error 500
     response_data: Dict[str, Any] = {
-        "origin": [float(GRAPH.nodes[origin_node].get('y', start_lat)),
-                   float(GRAPH.nodes[origin_node].get('x', start_lon))],
-        "destination": [float(GRAPH.nodes[destination_node].get('y', end_lat)),
-                        float(GRAPH.nodes[destination_node].get('x', end_lon))],
+        "origin": [origin_node[1], origin_node[0]],  # [lat, lon]
+        "destination": [destination_node[1], destination_node[0]],
         "a_star": None,
         "greedy": None
     }
@@ -117,8 +108,7 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
             raise HTTPException(status_code=404, detail="No se encontró un camino viable con A*.")
 
         response_data["a_star"] = {
-            # Extraemos Lat, Lon de cada nodo de la ruta
-            "route": [[float(GRAPH.nodes[n].get('y', 0)), float(GRAPH.nodes[n].get('x', 0))] for n in a_star_path],
+            "route": [[n[1], n[0]] for n in a_star_path],
             "history_visited": a_star_history,
             "cost": a_star_cost,
             "explored_nodes": a_star_explored,
@@ -136,7 +126,7 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
             raise HTTPException(status_code=404, detail="No se encontró un camino viable con Greedy.")
 
         response_data["greedy"] = {
-            "route": [[float(GRAPH.nodes[n].get('y', 0)), float(GRAPH.nodes[n].get('x', 0))] for n in greedy_path],
+            "route": [[n[1], n[0]] for n in greedy_path],
             "history_visited": greedy_history,
             "cost": greedy_cost,
             "explored_nodes": len(greedy_history),
@@ -160,14 +150,9 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
     if not nearest_emergency:
         raise HTTPException(status_code=500, detail="No se pudieron cargar los datos.")
 
-    origin_node = find_nearest_node(start_lat, start_lon)
-    destination_node = find_nearest_node(nearest_emergency['lat'], nearest_emergency['lon'])
-
     route_request = RouteRequest(
-        origen=(float(GRAPH.nodes[origin_node].get('y', start_lat)),
-                float(GRAPH.nodes[origin_node].get('x', start_lon))),
-        destino=(float(GRAPH.nodes[destination_node].get('y', nearest_emergency['lat'])),
-                 float(GRAPH.nodes[destination_node].get('x', nearest_emergency['lon']))),
+        origen=(start_lat, start_lon),
+        destino=(nearest_emergency['lat'], nearest_emergency['lon']),
         alpha=request.alpha,
         beta=request.beta,
         mode=request.mode
@@ -181,24 +166,16 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
 
 @app.get("/api/heatmap")
 def get_heatmap_data():
-    # CORRECCIÓN: Leemos el mapa de calor directo del Grafo (100% confiable y sin depender del CSV en el backend)
     heatmap_points = []
     if GRAPH is not None:
         for u, v, data in GRAPH.edges(data=True):
-            try:
-                lat = float(GRAPH.nodes[u].get('y', 0))
-                lon = float(GRAPH.nodes[u].get('x', 0))
-                # Buscamos el riesgo (o usamos un valor base si alguna calle no lo tiene)
-                risk = float(data.get('harassmentRisk', 0.5))
+            # Como 'u' es una tupla, la desempaquetamos directamente
+            lon, lat = u
+            risk = float(data.get('harassmentRisk', 0.5))
+            heatmap_points.append([lat, lon, risk])
 
-                if lat != 0 and lon != 0:
-                    heatmap_points.append([lat, lon, risk])
-            except Exception:
-                continue
-
-        # Limitamos la muestra para que el mapa web no colapse dibujando demasiados puntos de calor
+        # Muestra para no saturar la RAM del navegador
         if len(heatmap_points) > 5000:
             heatmap_points = random.sample(heatmap_points, 5000)
 
-        return heatmap_points
-    return []
+    return heatmap_points

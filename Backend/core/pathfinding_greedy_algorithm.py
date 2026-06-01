@@ -28,18 +28,12 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
         history_visited.append((parent_node, current_node))
 
         if current_node == destination:
+            # CORRECCIÓN: Extraemos directamente lon, lat de la tupla del nodo
             history_coords = []
             for u, v in history_visited:
-                try:
-                    lat_u = float(graph.nodes[u].get('y', 0))
-                    lon_u = float(graph.nodes[u].get('x', 0))
-                    lat_v = float(graph.nodes[v].get('y', 0))
-                    lon_v = float(graph.nodes[v].get('x', 0))
-
-                    if lat_u != 0 and lon_u != 0:
-                        history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
-                except Exception:
-                    continue
+                lon_u, lat_u = u
+                lon_v, lat_v = v
+                history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
 
             return current_route, current_cost, history_coords
 
