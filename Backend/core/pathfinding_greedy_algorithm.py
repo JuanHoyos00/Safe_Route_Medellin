@@ -1,7 +1,6 @@
 import heapq
 from Backend.utils.math_utils import heuristic_haversine
 
-
 def algorithm_greedy(graph, origin, destination, alpha, beta):
     if origin not in graph or destination not in graph:
         return None, float('inf'), []
@@ -39,7 +38,7 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
 
                     if lat_u != 0 and lon_u != 0:
                         history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
-                except Exception as e:
+                except Exception:
                     continue
 
             return current_route, current_cost, history_coords
@@ -47,9 +46,7 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
         for neighbor in graph.neighbors(current_node):
             if neighbor not in closed_set:
                 edge_data = graph.get_edge_data(current_node, neighbor)
-
                 normalized_length = edge_data['normalized_length']
-
                 base_risk = edge_data['harassmentRisk']
                 cameras = edge_data.get('cameras_count', 0)
                 incidents = edge_data.get('incidents_count', 0)
@@ -64,4 +61,4 @@ def algorithm_greedy(graph, origin, destination, alpha, beta):
                 heapq.heappush(priority_queue,
                                (priority_score, neighbor, current_route + [neighbor], current_cost + edge_cost))
 
-    return None, float('inf'), history_visited
+    return None, float('inf'), []

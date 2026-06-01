@@ -44,6 +44,7 @@ def algorithm_a_star(graph, origin, destination, alpha, beta):
                 current = previous_path[current]
             route.append(origin)
             route.reverse()
+
             history_coords = []
             for u, v in history_visited:
                 try:
@@ -54,17 +55,14 @@ def algorithm_a_star(graph, origin, destination, alpha, beta):
 
                     if lat_u != 0 and lon_u != 0:
                         history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
-                except Exception as e:
+                except Exception:
                     continue
 
             return route, total_cost, explored_nodes, history_coords
 
-
         for neighbor in graph.neighbors(current_node):
             edge_data = graph.get_edge_data(current_node, neighbor)
-
             normalized_length = edge_data['normalized_length']
-
             base_risk = edge_data['harassmentRisk']
             cameras = edge_data.get('cameras_count', 0)
             incidents = edge_data.get('incidents_count', 0)
@@ -82,4 +80,4 @@ def algorithm_a_star(graph, origin, destination, alpha, beta):
                                                                             max_city_distance)
                 heapq.heappush(priority_queue, (f_score[neighbor], neighbor))
 
-    return None, float('inf'), explored_nodes, history_visited
+    return None, float('inf'), explored_nodes, []

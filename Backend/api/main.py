@@ -12,33 +12,40 @@ from Backend.core.pathfinding_a_star_algorithm import algorithm_a_star
 from Backend.core.pathfinding_greedy_algorithm import algorithm_greedy
 from Backend.core.emergency_locator import EmergencyLocator
 
+# === RESOLUCIÓN ABSOLUTA DE RUTAS ===
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CSV_PATH = os.path.join(BASE_DIR, "Data", "unified_medellin_data.csv")
+
+# Fallbacks de seguridad por si el entorno virtual cambia el directorio de trabajo
+if not os.path.exists(CSV_PATH):
+    CSV_PATH = "Data/unified_medellin_data.csv"
+if not os.path.exists(CSV_PATH):
+    CSV_PATH = "unified_medellin_data.csv"
+
 GRAPH: Any = None
 NODES_LIST: List[Any] = []
 DATA_TREE: Any = None
 EMERGENCY_LOCATOR: Any = None
 
-
 @asynccontextmanager
 async def lifespan(_fastapi_app: FastAPI):
     global GRAPH, NODES_LIST, DATA_TREE, EMERGENCY_LOCATOR
 
-    csv_path = "unified_medellin_data.csv"
+    print(f"[API] Cargando grafo para Medellín desde {CSV_PATH}...")
+    try:
+        GRAPH = build_medellin_graph(CSV_PATH)
+        NODES_LIST = list(GRAPH.nodes)
 
-    print(f"[API] Cargando grafo para Medellín...")
-    GRAPH = build_medellin_graph(csv_path)
-    NODES_LIST = list(GRAPH.nodes)
-
-
-    from scipy.spatial import KDTree
-    DATA_TREE = KDTree(NODES_LIST)
-    print(f"[API] Grafo cargado exitosamente. {len(NODES_LIST)} nodos indexados.")
+        from scipy.spatial import KDTree
+        DATA_TREE = KDTree(NODES_LIST)
+        print(f"[API] Grafo cargado exitosamente. {len(NODES_LIST)} nodos indexados.")
+    except Exception as e:
+        print(f"[ERROR CRÍTICO] No se pudo cargar el grafo: {e}")
 
     print(f"[API] Iniciando Localizador de Emergencias...")
     EMERGENCY_LOCATOR = EmergencyLocator()
-
     yield
     print("[API] Servidor apagándose, liberando memoria...")
-
 
 app = FastAPI(title="Medellin Safe Routing API", lifespan=lifespan)
 
@@ -50,12 +57,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 def find_nearest_node(lat: float, lon: float) -> Any:
     target = (lon, lat)
     _, index = DATA_TREE.query(target)
     return NODES_LIST[index]
-
 
 class RouteRequest(BaseModel):
     origen: Tuple[float, float]
@@ -64,26 +69,12 @@ class RouteRequest(BaseModel):
     beta: float
     mode: str = "both"
 
-
 class EmergencyRequest(BaseModel):
     origen: Tuple[float, float]
-    tipo_emergencia: str  # "cai" o "hospital"
+    tipo_emergencia: str
     alpha: float
     beta: float
     mode: str = "both"
-
-
-@app.get("/api/heatmap")
-def get_heatmap_data() -> List[List[float]]:
-    heatmap_points = []
-
-    if GRAPH is not None:
-        for u, v, data in GRAPH.edges(data=True):
-            lon, lat = u
-            risk = data.get('harassmentRisk', 0.0)
-            heatmap_points.append([lat, lon, risk])
-    return heatmap_points
-
 
 @app.post("/api/calculate-routes")
 def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
@@ -114,7 +105,7 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
 
         response_data["a_star"] = {
             "route": [[n[1], n[0]] for n in a_star_path],
-            "history_visited": [[[padre[1], padre[0]], [hijo[1], hijo[0]]] for padre, hijo in a_star_history],
+            "history_visited": a_star_history, # Se inyecta directo porque el algoritmo ya lo formatea
             "cost": a_star_cost,
             "explored_nodes": a_star_explored,
             "execution_time": ast_time
@@ -132,14 +123,13 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
 
         response_data["greedy"] = {
             "route": [[n[1], n[0]] for n in greedy_path],
-            "history_visited": [[[padre[1], padre[0]], [hijo[1], hijo[0]]] for padre, hijo in greedy_history],
+            "history_visited": greedy_history, # Se inyecta directo
             "cost": greedy_cost,
             "explored_nodes": len(greedy_history),
             "execution_time": gre_time
         }
 
     return response_data
-
 
 @app.post("/api/emergency-route")
 def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
@@ -150,10 +140,10 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
     elif request.tipo_emergencia == "hospital":
         nearest_emergency = EMERGENCY_LOCATOR.get_nearest_hospital(start_lon, start_lat)
     else:
-        raise HTTPException(status_code=400, detail="Tipo de emergencia inválido. Usa 'cai' o 'hospital'.")
+        raise HTTPException(status_code=400, detail="Tipo de emergencia inválido.")
 
     if not nearest_emergency:
-        raise HTTPException(status_code=500, detail="No se pudieron cargar los datos de emergencia.")
+        raise HTTPException(status_code=500, detail="No se pudieron cargar los datos.")
 
     origin_node = find_nearest_node(start_lat, start_lon)
     destination_node = find_nearest_node(nearest_emergency['lat'], nearest_emergency['lon'])
@@ -171,24 +161,12 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
 
     return response_data
 
-@app.get("/api/heatmap")  # Aseguramos el prefijo /api para acoplarse con SafeRouteAPI
+@app.get("/api/heatmap")
 def get_heatmap_data():
     try:
-        # Encontrar la raíz del proyecto dinámicamente desde Backend/api/main.py
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Retrocedemos dos niveles hacia Safe_Route_Medellin y entramos a Data/
-        csv_path = os.path.normpath(os.path.join(current_dir, "../../Data/unified_medellin_data.csv"))
-
-        if not os.path.exists(csv_path):
-            # Intento de respaldo si tu entorno de ejecución inicia directamente desde la raíz
-            csv_path = "Data/unified_medellin_data.csv"
-
-        df = pd.read_csv(csv_path)
-
-        # Limpiamos nulos de geolocalización
+        df = pd.read_csv(CSV_PATH)
         df_clean = df[['lat', 'lon', 'combined_cost']].dropna()
 
-        # Si el set de datos es muy pesado, tomamos una muestra equilibrada para optimizar la carga del mapa
         if len(df_clean) > 8000:
             df_clean = df_clean.sample(n=4000, random_state=42)
 
@@ -203,4 +181,4 @@ def get_heatmap_data():
         return df_clean[['lat', 'lon', 'weight']].values.tolist()
 
     except Exception as e:
-        return {"error": f"Fallo al procesar CSV en la ruta establecida: {str(e)}"}
+        return {"error": f"Fallo al procesar CSV: {str(e)}"}
