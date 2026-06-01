@@ -34,7 +34,6 @@ async def lifespan(_fastapi_app: FastAPI):
     print(f"[API] Cargando grafo para Medellín desde {CSV_PATH}...")
     try:
         GRAPH = build_medellin_graph(CSV_PATH)
-        # Como los nodos YA SON tuplas (lon, lat), podemos pasarlos directico
         NODES_LIST = list(GRAPH.nodes)
         DATA_TREE = KDTree(NODES_LIST)
         print(f"[API] Grafo cargado exitosamente. {len(NODES_LIST)} nodos indexados.")
@@ -59,10 +58,12 @@ app.add_middleware(
 
 
 def find_nearest_node(lat: float, lon: float) -> Any:
-    # Ajustado al formato de los datos: (Longitud, Latitud)
     target = (lon, lat)
+    print(f"[KDTree] Buscando vecino más cercano para el click -> Lat: {lat}, Lon: {lon}")
     _, index = DATA_TREE.query(target)
-    return NODES_LIST[index]
+    chosen_node = NODES_LIST[index]
+    print(f"[KDTree] Nodo asignado -> Lon: {chosen_node[0]}, Lat: {chosen_node[1]}")
+    return chosen_node
 
 
 class RouteRequest(BaseModel):
@@ -71,6 +72,7 @@ class RouteRequest(BaseModel):
     alpha: float
     beta: float
     mode: str = "both"
+    algorithm: str = None  # Tolerancia por si el frontend usa 'algorithm'
 
 
 class EmergencyRequest(BaseModel):
@@ -79,6 +81,7 @@ class EmergencyRequest(BaseModel):
     alpha: float
     beta: float
     mode: str = "both"
+    algorithm: str = None  # Tolerancia por si el frontend usa 'algorithm'
 
 
 @app.post("/api/calculate-routes")
@@ -89,9 +92,10 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
     origin_node = find_nearest_node(start_lat, start_lon)
     destination_node = find_nearest_node(end_lat, end_lon)
 
-    mode = request.mode
+    # Normalizamos el modo para aceptar 'a_star', 'astar', 'A*', etc.
+    raw_mode = request.algorithm if request.algorithm else request.mode
+    mode = raw_mode.lower().strip().replace("_", "")
 
-    # Le damos la vuelta para el frontend [lat, lon]
     response_data: Dict[str, Any] = {
         "origin": [origin_node[1], origin_node[0]],
         "destination": [destination_node[1], destination_node[0]],
@@ -106,16 +110,16 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
         )
         ast_time = time.time() - start_time_ast
 
-        if not a_star_path:
+        if a_star_path:
+            response_data["a_star"] = {
+                "route": [[n[1], n[0]] for n in a_star_path],
+                "history_visited": a_star_history,
+                "cost": a_star_cost,
+                "explored_nodes": a_star_explored,
+                "execution_time": ast_time
+            }
+        elif mode == "astar":
             raise HTTPException(status_code=404, detail="No se encontró un camino viable con A*.")
-
-        response_data["a_star"] = {
-            "route": [[n[1], n[0]] for n in a_star_path],
-            "history_visited": a_star_history,
-            "cost": a_star_cost,
-            "explored_nodes": a_star_explored,
-            "execution_time": ast_time
-        }
 
     if mode in ["greedy", "both"]:
         start_time_gre = time.time()
@@ -124,16 +128,16 @@ def calculate_routes(request: RouteRequest) -> Dict[str, Any]:
         )
         gre_time = time.time() - start_time_gre
 
-        if not greedy_path:
+        if greedy_path:
+            response_data["greedy"] = {
+                "route": [[n[1], n[0]] for n in greedy_path],
+                "history_visited": greedy_history,
+                "cost": greedy_cost,
+                "explored_nodes": len(greedy_history),
+                "execution_time": gre_time
+            }
+        elif mode == "greedy":
             raise HTTPException(status_code=404, detail="No se encontró un camino viable con Greedy.")
-
-        response_data["greedy"] = {
-            "route": [[n[1], n[0]] for n in greedy_path],
-            "history_visited": greedy_history,
-            "cost": greedy_cost,
-            "explored_nodes": len(greedy_history),
-            "execution_time": gre_time
-        }
 
     return response_data
 
@@ -150,14 +154,16 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="Tipo de emergencia inválido.")
 
     if not nearest_emergency:
-        raise HTTPException(status_code=500, detail="No se pudieron cargar los datos.")
+        raise HTTPException(status_code=500, detail="No se pudieron cargar los datos de emergencia.")
 
+    # Mantenemos el algoritmo seleccionado por el usuario para la ruta final
     route_request = RouteRequest(
         origen=(start_lat, start_lon),
         destino=(nearest_emergency['lat'], nearest_emergency['lon']),
         alpha=request.alpha,
         beta=request.beta,
-        mode=request.mode
+        mode=request.mode,
+        algorithm=request.algorithm
     )
 
     response_data = calculate_routes(route_request)
@@ -170,11 +176,24 @@ def calculate_emergency_route(request: EmergencyRequest) -> Dict[str, Any]:
 def get_heatmap_data():
     heatmap_points = []
     if GRAPH is not None:
+        coord_risks = {}
+
+        # Agrupamos por coordenada para evitar la superposición masiva de aristas
         for u, v, data in GRAPH.edges(data=True):
-            # 'u' ya es la tupla (lon, lat)
             lon, lat = u[0], u[1]
             risk = float(data.get('harassmentRisk', 0.5))
-            heatmap_points.append([lat, lon, risk])
+
+            # Redondeamos a 5 decimales (~1 metro de precisión) para consolidar cruces
+            geo_key = (round(lat, 5), round(lon, 5))
+            if geo_key not in coord_risks:
+                coord_risks[geo_key] = []
+            coord_risks[geo_key].append(risk)
+
+        # Generamos los puntos promediados y suavizados
+        for (lat, lon), risks in coord_risks.items():
+            avg_risk = sum(risks) / len(risks)
+            # Factor de suavizado (0.3) para que la mancha no se sature de rojo intenso
+            heatmap_points.append([lat, lon, avg_risk * 0.3])
 
         if len(heatmap_points) > 5000:
             heatmap_points = random.sample(heatmap_points, 5000)
