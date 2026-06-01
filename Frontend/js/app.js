@@ -1,5 +1,5 @@
 // ==========================================
-// app.js - Control de Interfaz de Usuario (Modo Dual de Ruta Corregido)
+// app.js - Control de Interfaz (Colores Fuertes y Heatmap Reparado)
 // ==========================================
 
 let estadoClick = 'origen';
@@ -20,15 +20,13 @@ const statsPanel = document.getElementById('stats-panel');
 const panelLateral = document.getElementById('panel-lateral');
 const toggleBtn = document.getElementById('toggle-panel');
 const algoSelect = document.getElementById('algo-select');
-
-// Nuevas Referencias
 const barrioOrigenSelect = document.getElementById('barrio-origen-select');
 const barrioDestinoSelect = document.getElementById('barrio-destino-select');
 const chkMapaCalor = document.getElementById('chk-mapa-calor');
 const btnBuscarAnimado = document.getElementById('btn-buscar-animado');
 const btnMostrarInstantaneo = document.getElementById('btn-mostrar-instantaneo');
 
-// 1. OCULTAR/MOSTRAR PANEL LATERAL
+// 1. OCULTAR/MOSTRAR PANEL
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
         panelLateral.classList.toggle('oculto');
@@ -42,7 +40,7 @@ if (toggleBtn) {
     });
 }
 
-// 2. CONFIGURACIÓN DEL SLIDER ÚNICO
+// 2. SLIDER
 if (rutaSlider) {
     rutaSlider.addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
@@ -54,10 +52,9 @@ if (rutaSlider) {
     });
 }
 
-// 3. SELECCIÓN POR CLICS EN EL MAPA
+// 3. CLICS EN EL MAPA
 map.on('click', function(e) {
     if (mapaBloqueado) return;
-
     const lat = parseFloat(e.latlng.lat.toFixed(6));
     const lon = parseFloat(e.latlng.lng.toFixed(6));
 
@@ -76,7 +73,7 @@ map.on('click', function(e) {
     }
 });
 
-// 4. SELECCIÓN POR GPS
+// 4. GPS
 function obtenerGPS(inputElement, esOrigen, selectAsociado) {
     if (mapaBloqueado) return alert("Limpia el mapa primero.");
     if (!navigator.geolocation) return alert("Tu navegador no soporta GPS.");
@@ -108,7 +105,7 @@ function obtenerGPS(inputElement, esOrigen, selectAsociado) {
 document.getElementById('btn-gps-origen').addEventListener('click', () => obtenerGPS(origenInput, true, barrioOrigenSelect));
 document.getElementById('btn-gps-destino').addEventListener('click', () => obtenerGPS(destinoInput, false, barrioDestinoSelect));
 
-// 5. ATAJOS POR BARRIOS
+// 5. BARRIOS
 barrioOrigenSelect.addEventListener('change', (e) => {
     if (mapaBloqueado) {
         barrioOrigenSelect.value = "";
@@ -123,7 +120,6 @@ barrioOrigenSelect.addEventListener('change', (e) => {
         map.setView(coordsOrigen, 15);
     }
 });
-
 barrioDestinoSelect.addEventListener('change', (e) => {
     if (mapaBloqueado) {
         barrioDestinoSelect.value = "";
@@ -139,9 +135,8 @@ barrioDestinoSelect.addEventListener('change', (e) => {
     }
 });
 
-// 6. BOTÓN LIMPIAR MAPA (REPARADO POR COMPLETO)
+// 6. LIMPIAR MAPA
 document.getElementById('btn-limpiar').addEventListener('click', () => {
-    // Apagar hilos del navegador de inmediato
     if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
     if (window.routeTimeout) clearTimeout(window.routeTimeout);
 
@@ -179,22 +174,18 @@ function parsearEntradaManual(texto) {
     return null;
 }
 
-// 7. FLUJO UNIFICADO DE LLAMADO AL BACKEND
+// 7. FLUJO UNIFICADO
 async function ejecutarFlujoRuta(conAnimacion) {
     if (origenInput.value) coordsOrigen = parsearEntradaManual(origenInput.value) || coordsOrigen;
     if (destinoInput.value) coordsDestino = parsearEntradaManual(destinoInput.value) || coordsDestino;
 
-    if (!coordsOrigen || !coordsDestino) {
-        return alert("Asegúrate de ingresar un origen y un destino válidos.");
-    }
+    if (!coordsOrigen || !coordsDestino) return alert("Ingresa origen y destino válidos.");
 
-    // SI ESTÁ ANIMANDO Y LE DAN AL BOTÓN INSTANTÁNEO -> SE CORTE DE INMEDIATO
     if (esAnimandoActualmente && !conAnimacion && datosUltimaRespuesta) {
         pintarTodoInstantaneo(datosUltimaRespuesta);
         return;
     }
 
-    // Limpieza estándar preventiva
     if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
     if (window.routeTimeout) clearTimeout(window.routeTimeout);
     MapManager.clearRoutes();
@@ -205,12 +196,8 @@ async function ejecutarFlujoRuta(conAnimacion) {
     const modo = algoSelect.value;
 
     mapaBloqueado = true;
-
-    if(conAnimacion) {
-        btnBuscarAnimado.innerText = "Calculando...";
-    } else {
-        btnMostrarInstantaneo.innerText = "Calculando...";
-    }
+    if(conAnimacion) btnBuscarAnimado.innerText = "Calculando...";
+    else btnMostrarInstantaneo.innerText = "Calculando...";
 
     const data = await SafeRouteAPI.calculateRoute(coordsOrigen, coordsDestino, alpha, beta, modo);
 
@@ -226,13 +213,12 @@ async function ejecutarFlujoRuta(conAnimacion) {
 btnBuscarAnimado.addEventListener('click', () => ejecutarFlujoRuta(true));
 btnMostrarInstantaneo.addEventListener('click', () => ejecutarFlujoRuta(false));
 
-// 8. PROCESAR RESPUESTA Y ACOPLAMIENTO DE RENDERIZACIÓN
+// 8. PROCESAR RESPUESTA Y ANIMACIÓN (Colores Continuos y Fuertes)
 function procesarRespuesta(data, modo, conAnimacion) {
     if(data.origin) MapManager.setOrigin(data.origin[0], data.origin[1]);
     if(data.destination) MapManager.setDestination(data.destination[0], data.destination[1]);
 
     statsPanel.classList.remove('hidden');
-
     document.getElementById('wrap-astar').style.display = (modo === 'both' || modo === 'astar') ? 'block' : 'none';
     document.getElementById('wrap-greedy').style.display = (modo === 'both' || modo === 'greedy') ? 'block' : 'none';
 
@@ -247,17 +233,14 @@ function procesarRespuesta(data, modo, conAnimacion) {
 
     if (conAnimacion) {
         esAnimandoActualmente = true;
-
         const histA = data.a_star ? data.a_star.history_visited : null;
         const histG = data.greedy ? data.greedy.history_visited : null;
 
-        // Disparamos la carrera sincronizada
         MapManager.animateRace(histA, histG, () => {
-            // Callback: Esto se ejecuta solo cuando la carrera termina
             esAnimandoActualmente = false;
-            // Usamos colores de alto contraste: Fucsia para Greedy (dashed), Cian para A* (sólido)
-            if (data.greedy) MapManager.drawRoute(data.greedy.route, "#ff00aa", true);
-            if (data.a_star) MapManager.drawRoute(data.a_star.route, "#00e5ff", false);
+            // Se pintan CONTINUAS (ambas) y con colores fuertes
+            if (data.greedy) MapManager.drawRoute(data.greedy.route, "#ff0055"); // Fucsia Fuerte
+            if (data.a_star) MapManager.drawRoute(data.a_star.route, "#00ffff"); // Cian Brillante
         });
 
     } else {
@@ -267,35 +250,41 @@ function procesarRespuesta(data, modo, conAnimacion) {
 
 function pintarTodoInstantaneo(data) {
     esAnimandoActualmente = false;
-
     if (window.explorationTimeout) clearTimeout(window.explorationTimeout);
     if (window.routeTimeout) clearTimeout(window.routeTimeout);
     MapManager.clearRoutes();
 
-    if (data.greedy && data.greedy.route) {
-        MapManager.drawRoute(data.greedy.route, "#ff00aa", true);
-    }
-    if (data.a_star && data.a_star.route) {
-        MapManager.drawRoute(data.a_star.route, "#00e5ff", false);
-    }
+    if (data.greedy && data.greedy.route) MapManager.drawRoute(data.greedy.route, "#ff0055");
+    if (data.a_star && data.a_star.route) MapManager.drawRoute(data.a_star.route, "#00ffff");
 }
 
-// 9. REPARACIÓN DEL MAPA DE CALOR ASÍNCRONO
+// 9. MAPA DE CALOR: TRADUCTOR BLINDADO
 chkMapaCalor.addEventListener('change', async (e) => {
     if (e.target.checked) {
         if (!capaMapaCalor) {
             try {
-                // Buscamos dinámicamente la dirección real configurada en tu api.js
                 const urlCalor = `${SafeRouteAPI.BASE_URL}/heatmap`;
                 const response = await fetch(urlCalor);
                 if (!response.ok) throw new Error("Fallo de red.");
 
-                const puntosCSV = await response.json();
+                const rawData = await response.json();
 
-                // Usamos la configuración optimizada de MapManager
-                capaMapaCalor = MapManager.renderHeatmap(puntosCSV);
+                // EL TRADUCTOR: Convierte cualquier formato raro del backend a [lat, lon, intensidad]
+                const puntosProcesados = rawData.map(item => {
+                    if (Array.isArray(item)) return [parseFloat(item[0]), parseFloat(item[1]), parseFloat(item[2] || 1.0)];
+                    return [
+                        parseFloat(item.lat || item.y || 0),
+                        parseFloat(item.lon || item.x || item.lng || 0),
+                        parseFloat(item.riesgo || item.risk || item.weight || 1.0)
+                    ];
+                }).filter(p => !isNaN(p[0]) && !isNaN(p[1]) && p[0] !== 0);
+
+                if (puntosProcesados.length === 0) throw new Error("Los datos llegaron vacíos o mal formateados.");
+
+                capaMapaCalor = MapManager.renderHeatmap(puntosProcesados);
             } catch (err) {
-                console.error("Error cargando backend, ejecutando simulación segura:", err);
+                console.error("Error crítico cargando el mapa de calor:", err);
+                // Fallback agresivo para que igual se vea algo en pantalla
                 const puntosFallback = [
                     [6.2442, -75.5714, 0.9], [6.2460, -75.5670, 0.8],
                     [6.2625, -75.5510, 0.85], [6.2100, -75.5650, 0.2]
@@ -305,9 +294,7 @@ chkMapaCalor.addEventListener('change', async (e) => {
         }
         capaMapaCalor.addTo(map);
     } else {
-        if (capaMapaCalor) {
-            map.removeLayer(capaMapaCalor);
-        }
+        if (capaMapaCalor) map.removeLayer(capaMapaCalor);
     }
 });
 
@@ -335,7 +322,7 @@ async function ejecutarEmergencia(tipo) {
         MapManager.setDestination(coordsDestino[0], coordsDestino[1], true);
         destinoInput.value = `${coordsDestino[0].toFixed(6)}, ${coordsDestino[1].toFixed(6)}`;
         barrioDestinoSelect.value = "";
-        procesarRespuesta(data, modo, false); // Las emergencias pintan de una por seguridad
+        procesarRespuesta(data, modo, false);
     }
 }
 document.getElementById('btn-cai').addEventListener('click', () => ejecutarEmergencia('cai'));

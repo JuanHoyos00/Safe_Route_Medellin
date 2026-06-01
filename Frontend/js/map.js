@@ -1,9 +1,9 @@
 // ==========================================
-// map.js - Lógica visual de Leaflet (Optimizada y Sincronizada)
+// map.js - Lógica visual de Leaflet (Líneas continuas y colores fuertes)
 // ==========================================
 
 const map = L.map('mapa', {
-    preferCanvas: true // Fundamental para aguantar miles de líneas del "Pulpo"
+    preferCanvas: true
 }).setView([6.2442, -75.5812], 13);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -36,70 +36,66 @@ const MapManager = {
         animationCounter++;
     },
 
-    // Dibuja la ruta final sólida
-    drawRoute(routeCoords, color, isDashed = false) {
+    // Ruta final (Línea sólida y gruesa para AMBOS algoritmos)
+    drawRoute(routeCoords, colorHex) {
         const polyline = L.polyline(routeCoords, {
-            color: color,
-            weight: 6, // Ruta final más gruesa para que resalte
-            opacity: 1.0,
-            dashArray: isDashed ? '12, 12' : null,
-            lineCap: 'round'
+            color: colorHex,
+            weight: 7, // Bien gruesa
+            opacity: 1.0, // Cero transparencia
+            lineCap: 'round',
+            lineJoin: 'round'
         }).addTo(map);
 
-        // Efecto de brillo/sombra para resaltar sobre el mapa de calor
+        // Brillo blanco de fondo para que resalte incluso en el mapa de calor
         const glow = L.polyline(routeCoords, {
-            color: '#ffffff', weight: 10, opacity: 0.5, lineCap: 'round'
+            color: '#ffffff', weight: 12, opacity: 0.6, lineCap: 'round', lineJoin: 'round'
         }).addTo(map);
 
         currentLayers.push(glow, polyline);
         return polyline;
     },
 
-    // LA CARRERA SINCRONIZADA: Pulpo (A*) vs Culebra (Greedy)
+    // LA CARRERA (Colores Neón Fuertes)
     animateRace(historyA, historyG, callbackTermino) {
         const currentAnimId = ++animationCounter;
 
-        const layerA = L.layerGroup().addTo(map); // Capa del Pulpo
-        const layerG = L.layerGroup().addTo(map); // Capa de la Culebra
+        const layerA = L.layerGroup().addTo(map);
+        const layerG = L.layerGroup().addTo(map);
         currentLayers.push(layerA, layerG);
 
         let indexA = 0;
         let indexG = 0;
 
-        // Calculamos cuántos pasos debe dar cada uno por fotograma para terminar parejos
-        // Como A* visita muchos más nodos, pintará más lineas por frame (más rápido)
-        const totalFrames = 120; // La animación durará aprox 2 segundos (a 60fps)
+        const totalFrames = 120;
         const chunkA = Math.ceil((historyA ? historyA.length : 0) / totalFrames) || 1;
         const chunkG = Math.ceil((historyG ? historyG.length : 0) / totalFrames) || 1;
 
-        // Colores Neón para contrastar con el mapa de calor
-        const colorPulpo = "#00e5ff";  // Cian brillante para A*
-        const colorCulebra = "#ff00aa"; // Fucsia/Magenta para Greedy
+        // COLORES SÚPER FUERTES
+        const colorPulpo = "#00ffff";  // Cian eléctrico brillante (A*)
+        const colorCulebra = "#ff0055"; // Rojo/Fucsia muy fuerte (Greedy)
 
         function drawFrame() {
-            if (currentAnimId !== animationCounter) return; // Cancelar si el usuario limpia mapa
+            if (currentAnimId !== animationCounter) return;
 
             let siguenPintando = false;
 
-            // Pintar los tentáculos del Pulpo (A*)
             if (historyA && indexA < historyA.length) {
                 const sliceA = historyA.slice(indexA, indexA + chunkA);
                 L.polyline(sliceA, {
                     color: colorPulpo,
-                    weight: 2,
-                    opacity: 0.15 // Transparente para que parezca una nube/mancha
+                    weight: 3,
+                    opacity: 0.5 // Subimos opacidad para que se vea claro el "pulpo"
                 }).addTo(layerA);
                 indexA += chunkA;
                 siguenPintando = true;
             }
 
-            // Pintar el rastro de la Culebra (Greedy)
             if (historyG && indexG < historyG.length) {
                 const sliceG = historyG.slice(indexG, indexG + chunkG);
                 L.polyline(sliceG, {
                     color: colorCulebra,
-                    weight: 3,
-                    opacity: 0.6 // Más sólido para que parezca una culebra moviéndose
+                    weight: 4,
+                    opacity: 0.9 // Casi sólido para la culebra
                 }).addTo(layerG);
                 indexG += chunkG;
                 siguenPintando = true;
@@ -108,9 +104,9 @@ const MapManager = {
             if (siguenPintando) {
                 requestAnimationFrame(drawFrame);
             } else {
-                // CUANDO TERMINAN LA CARRERA, ATENUAMOS LA BÚSQUEDA Y PINTAMOS LA RUTA FINAL
-                layerA.eachLayer(l => l.setStyle({ opacity: 0.05 }));
-                layerG.eachLayer(l => l.setStyle({ opacity: 0.2 }));
+                // Al terminar, bajamos la luz de la búsqueda un poco y llamamos la ruta final
+                layerA.eachLayer(l => l.setStyle({ opacity: 0.15 }));
+                layerG.eachLayer(l => l.setStyle({ opacity: 0.3 }));
                 if (callbackTermino) callbackTermino();
             }
         }
@@ -118,19 +114,19 @@ const MapManager = {
         requestAnimationFrame(drawFrame);
     },
 
-    // OPTIMIZACIÓN DEL MAPA DE CALOR
-    renderHeatmap(puntosCSV) {
-        return L.heatLayer(puntosCSV, {
-            radius: 20,       // Menos radio evita parches gigantes
-            blur: 25,         // Más blur suaviza las transiciones entre colores
-            maxZoom: 14,      // Evita que al hacer zoom in los puntos desaparezcan
-            max: 1.0,         // Asegura que el costo 1.0 sea el límite superior estricto
-            minOpacity: 0.4,  // Evita que las zonas de bajo riesgo queden invisibles
+    // MAPA DE CALOR: Parámetros forzados para que sea ultra visible
+    renderHeatmap(puntos) {
+        return L.heatLayer(puntos, {
+            radius: 35,       // Más grande para tapar bien la zona
+            blur: 30,         // Suavizado
+            maxZoom: 16,
+            max: 1.0,
+            minOpacity: 0.6,  // Nunca será invisible
             gradient: {
-                0.2: '#3b82f6', // Azul (Seguro)
-                0.5: '#22c55e', // Verde (Normal)
-                0.7: '#f59e0b', // Naranja (Peligro Medio)
-                1.0: '#ef4444'  // Rojo (Peligro Alto)
+                0.3: '#2563eb', // Azul
+                0.5: '#10b981', // Verde
+                0.7: '#f59e0b', // Naranja
+                1.0: '#ef4444'  // Rojo Fuerte
             }
         });
     }
