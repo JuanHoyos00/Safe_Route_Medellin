@@ -46,10 +46,16 @@ def algorithm_a_star(graph, origin, destination, alpha, beta):
             route.reverse()
             history_coords = []
             for u, v in history_visited:
-                lat_u, lon_u = graph.nodes[u]['y'], graph.nodes[u]['x']
-                lat_v, lon_v = graph.nodes[v]['y'], graph.nodes[v]['x']
+                try:
+                    lat_u = float(graph.nodes[u].get('y', 0))
+                    lon_u = float(graph.nodes[u].get('x', 0))
+                    lat_v = float(graph.nodes[v].get('y', 0))
+                    lon_v = float(graph.nodes[v].get('x', 0))
 
-                history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
+                    if lat_u != 0 and lon_u != 0:
+                        history_coords.append([[lat_u, lon_u], [lat_v, lon_v]])
+                except Exception as e:
+                    continue
 
             return route, total_cost, explored_nodes, history_coords
 
